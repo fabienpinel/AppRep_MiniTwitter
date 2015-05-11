@@ -12,7 +12,6 @@ public class Main {
         server.run();
 
         System.out.println("Démarrage du JMS");
-        JMS_server jmserv = new JMS_server();
-        jmserv.configurer();
+
     }
 }
