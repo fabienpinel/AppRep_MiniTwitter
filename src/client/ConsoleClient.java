@@ -133,7 +133,7 @@ public class ConsoleClient {
         boolean topicCorrect = false;
         int topic = -1;
         String tweet = "";
-        while(!messageCorrect && !topicCorrect){
+        while(!messageCorrect || !topicCorrect){
             System.out.println("Choisissez votre topic:");
             this.listTopics();
             this.console.getNextLine();
