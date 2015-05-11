@@ -6,8 +6,6 @@ package client;
 public class ConsoleClient {
     //Longueur maximale d'un tweet
     public static int LONGUEUR_MAXIMALE_TWEET = 140;
-    //longueur macimale d'un hashtag
-    public static int LONGUEUR_MAXIMALE_HASHTAG = 100;
 
     //console permettant de récupérer ce que l'utilisateur tape
     private Console console = null;
@@ -72,12 +70,12 @@ public class ConsoleClient {
 
     /**
      * Vérification de la validité du hashtag
-     * # au début et taille raisonnable fixée arbitrairement à 100 caractères
+     * # au début
      * @param hashtag string du hashtag
      * @return vrai ou faux suivant la validité
      */
     public boolean checkValidHashtag(String hashtag){
-        return ((hashtag.charAt(0)=='#') && hashtag.length()<=LONGUEUR_MAXIMALE_HASHTAG);
+        return ((hashtag.charAt(0)=='#'));
     }
 
     /**
