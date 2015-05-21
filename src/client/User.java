@@ -1,7 +1,6 @@
 package client;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.leveldb.DurableSubscription;
 import server.AccountInformation;
 
 import javax.jms.*;
@@ -93,6 +92,7 @@ public class User implements javax.jms.MessageListener {
         try {
             Registry r = LocateRegistry.getRegistry(port);
             AccountInformation req = (AccountInformation) r.lookup("Server");
+            this.joinTopic("#basic");
             if(req.connect(pseudo, password)){
                 //configurer jms server puis start ?
                 this.configurerConsommateur();
@@ -211,7 +211,7 @@ public class User implements javax.jms.MessageListener {
                 addATopicToRMI(hashtagName);
 
                 // On veut pouvoir récupérer les messages entre deux connexions -> durableSubscriber
-                TopicSubscriber ds = receiveSession.createDurableSubscriber(t, "="+hashtagName+"_"+this.getUsername());
+                TopicSubscriber ds = receiveSession.createDurableSubscriber(t, "=" + hashtagName + "_" + this.getUsername());
                 this.followings.put(hashtagName, ds);
                 ds.setMessageListener(this);
                 this.topicAlreadySubscribed.add(hashtagName);
@@ -240,6 +240,7 @@ public class User implements javax.jms.MessageListener {
         mess.setString("content", tweet);
         mess.setJMSCorrelationID(idGenerator.nextId());
         mp.send(mess);
+
         //On post également le message sur le topic de l'user courant
         receiveSession.createProducer(receiveSession.createTopic(this.getUsername())).send(mess);
     }
@@ -250,12 +251,21 @@ public class User implements javax.jms.MessageListener {
             AccountInformation req = (AccountInformation) r.lookup("Server");
            req.registerANewTopic(topic);
 
+            //On post également le topic sur le topic principal.
+            MapMessage mess= receiveSession.createMapMessage();
+            mess.setString("author", "administrator");
+            mess.setString("content", topic);
+            receiveSession.createProducer(receiveSession.createTopic("basic")).send(mess);
+
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (NotBoundException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
             System.out.println(e.fillInStackTrace());
+        } catch (JMSException e) {
+            System.out.println("Could not create topic :" + e.getMessage());
+            e.printStackTrace();
         }
     }
     /**
