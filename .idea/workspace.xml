@@ -680,7 +680,7 @@
       <option name="number" value="Default" />
       <updated>1432204231606</updated>
       <workItem from="1432204232223" duration="1194000" />
-      <workItem from="1432205476037" duration="2465000" />
+      <workItem from="1432205476037" duration="2507000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed null queue problem">
       <created>1432205198063</created>
@@ -706,11 +706,17 @@
       <option name="project" value="LOCAL" />
       <updated>1432207901245</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Deleted workspace">
+      <created>1432207948342</created>
+      <option name="number" value="00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1432207948342</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3659000" />
+    <option name="totallyTimeSpent" value="3701000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="44" y="18" width="1322" height="750" extended-state="6" />
@@ -764,7 +770,8 @@
     <MESSAGE value="deleted more project files" />
     <MESSAGE value="Added createHashtag feature" />
     <MESSAGE value="Updated gitignore" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated gitignore" />
+    <MESSAGE value="Deleted workspace" />
+    <option name="LAST_COMMIT_MESSAGE" value="Deleted workspace" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
