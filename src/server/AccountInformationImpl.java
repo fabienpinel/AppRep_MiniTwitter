@@ -47,4 +47,10 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
         }
         return false;
     }
+
+    @Override
+    public boolean createAccount(String pseudo, String password) throws RemoteException {
+        this.accounts.put(pseudo, password);
+        return true;
+    }
 }

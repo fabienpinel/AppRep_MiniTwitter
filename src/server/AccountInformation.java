@@ -12,5 +12,6 @@ public interface AccountInformation extends Remote{
      * @throws RemoteException
      */
     public boolean connect(String pseudo, String password) throws RemoteException;
+    public boolean createAccount(String pseudo, String password) throws RemoteException;
 
 }
