@@ -33,10 +33,14 @@ public class ConsoleClient {
     private void initChoices(){
         this.choicesConnect[0] = "Se connecter";
         this.choicesConnect[1] = "Quitter";
-        this.choicesAlreadyConnected[0] = "Poster Un message";
-        this.choicesAlreadyConnected[1] = "Créer un nouveau hashtag";
-        this.choicesAlreadyConnected[2] = "Se déconnecter";
-        this.choicesAlreadyConnected[3] = "Quitter";
+        this.choicesAlreadyConnected = new String[] {
+				"Poster Un message",
+				"Créer un nouveau hashtag",
+				"S'abonner à un hashtag",
+				"Se désabonner à un hashtag",
+				"Se déconnecter",
+				"Quitter"
+		};
     }
 
     /**
@@ -189,24 +193,31 @@ public class ConsoleClient {
         while (!choiceValid || this.user.isConnected()) {
             this.displayChoices(this.choicesAlreadyConnected);
             int choice = Integer.parseInt(this.console.getNextLine());
+			choiceValid = true;
             switch (choice) {
                 case 0:
                     //poster un msg
                     this.postMessage();
-                    choiceValid = true;
                     break;
                 case 1:
                     //creer un nvx hashtag
                     this.createNewHashtag();
-                    choiceValid = true;
                     break;
-                case 2:
+				case 2:
+					// s'abonner
+					this.followHashtag();
+					break;
+				case 3:
+					// se désabonner
+					this.unfollowHashtag();
+					break;
+                case 5:
                     //se deconnecter
                     System.out.println("Déconnexion.");
                     this.user.setIsConnected(false);
                     this.run(this.port);
                     break;
-                case 3:
+                case 6:
                     //quitter
                     this.user.setIsConnected(false);
                     this.console.sayGoodbye();
@@ -257,6 +268,6 @@ public class ConsoleClient {
 		}
 		int i = readInt("Entrez le numero du hashtag duquel se désabonner:");
 		String hashtag = hashtags.get(i);
-		user.unfollowHashtag(hashtag);
+		user.unfollowTopic(hashtag);
 	}
 }

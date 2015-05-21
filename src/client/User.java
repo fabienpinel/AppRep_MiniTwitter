@@ -176,6 +176,16 @@ public class User implements javax.jms.MessageListener {
         }
     }
 
+	public void unfollowTopic(String topicName) {
+		MessageConsumer mc = followings.get(topicName);
+		try {
+			mc.close();
+			followings.remove(topicName);
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+	}
+
     public void post(String tweet, String topic) throws JMSException, NamingException  {
         Topic t = receiveSession.createTopic(topic);
         MessageProducer mp = receiveSession.createProducer(t);
@@ -203,11 +213,8 @@ public class User implements javax.jms.MessageListener {
 	public List<String> getFollowedHashTags() {
 		List<String> result = new LinkedList<>();
 		for (String s : followedTopics) {
-			
+			if (s.substring(0,0).equals("#")) result.add(s);
 		}
 		return result;
-	}
-
-	public void unfollowHashtag(String hashtag) {
 	}
 }
