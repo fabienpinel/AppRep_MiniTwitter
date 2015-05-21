@@ -97,6 +97,7 @@ public class User implements javax.jms.MessageListener {
                 this.configurerConsommateur();
                 this.joinTopic(this.getUsername());
                 this.joinTopic("#"+this.getPseudo()+"_favorites");
+                this.afficherTopicsDisponibles();
                 this.setIsConnected(true);
                 return true;
             }
@@ -113,6 +114,24 @@ public class User implements javax.jms.MessageListener {
         return false;
     }
 
+    public void afficherTopicsDisponibles(){
+        Registry r = null;
+        List<String> topics=null;
+        try {
+            r = LocateRegistry.getRegistry(port);
+            AccountInformation req = (AccountInformation) r.lookup("Server");
+            topics = req.getTopicList();
+            for(String s : topics){
+                System.out.println("Topic: "+s);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
     /*  GETTERS AND SETTERS */
     public String getPseudo() {
