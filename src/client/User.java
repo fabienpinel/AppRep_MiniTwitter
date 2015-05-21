@@ -30,7 +30,7 @@ public class User implements javax.jms.MessageListener {
 
 	private TweetIDGenerator idGenerator;
     private Map<String, MessageConsumer> followings = null;
-	private List<String> followedHashTags;
+	private List<String> followedTopics;
 
 	/**
      * Un utilisateur est identifié par un pseudo et un mot de passe
@@ -202,7 +202,7 @@ public class User implements javax.jms.MessageListener {
 
 	public List<String> getFollowedHashTags() {
 		List<String> result = new LinkedList<>();
-		for (String s : followedHashTags) {
+		for (String s : followedTopics) {
 			
 		}
 		return result;
