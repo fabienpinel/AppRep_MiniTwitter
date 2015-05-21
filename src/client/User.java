@@ -11,6 +11,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ public class User implements javax.jms.MessageListener {
     private javax.jms.Connection connect = null;
 
 	private TweetIDGenerator idGenerator;
+    private Map<String, MessageConsumer> followings = null;
 
     /**
      * Un utilisateur est identifié par un pseudo et un mot de passe
@@ -44,6 +46,7 @@ public class User implements javax.jms.MessageListener {
         this.isConnected = false;
 		this.idGenerator = new TweetIDGenerator();
         this.topicAlreadySubscribed = new ArrayList<String>();
+        this.followings = new HashMap<String, MessageConsumer>();
 
 		this.receivedMessages = new HashMap<>();
 
@@ -74,6 +77,8 @@ public class User implements javax.jms.MessageListener {
             if(req.connect(pseudo, password)){
                 //configurer jms server puis start ?
                 this.configurerConsommateur();
+                this.joinTopic("@" + this.getPseudo());
+                this.joinTopic("#"+this.getPseudo()+"_favorites");
                 this.setIsConnected(true);
                 return true;
             }
@@ -158,25 +163,15 @@ public class User implements javax.jms.MessageListener {
         }
     }
 
-    public void createHashtag(String hashtagName) {
+    public void joinTopic(String hashtagName) {
         try {
-            Topic t = receiveSession.createTopic(hashtagName);
             if(!this.topicAlreaySubscribed(hashtagName)){
+                Topic t = receiveSession.createTopic(hashtagName);
                 MessageConsumer mc = receiveSession.createConsumer(t);
+                this.followings.put(hashtagName, mc);
                 mc.setMessageListener(this);
                 this.topicAlreadySubscribed.add(hashtagName);
             }
-
-            /*MessageProducer mp = receiveSession.createProducer(t);
-            MapMessage mess = receiveSession.createMapMessage();
-            mess.setString("author", this.getPseudo());
-            mess.setString("content", "Création du topic");
-
-			MessageConsumer mc = receiveSession.createConsumer(t);
-			mc.setMessageListener(this);
-
-            mp.send(mess);*/
-			//System.out.println("Message envoyé!");
 		} catch (JMSException e) {
             System.err.println("Could not create topic '" + hashtagName + "'");
             e.printStackTrace();
