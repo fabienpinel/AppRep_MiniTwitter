@@ -137,4 +137,7 @@ public class User implements javax.jms.MessageListener {
             e.printStackTrace();
         }
     }
+    public boolean verifyIfTopicExists(String topicname){
+        return true;
+    }
 }

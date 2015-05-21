@@ -118,21 +118,11 @@ public class ConsoleClient {
      * @param topic numero de topic
      * @return true ou false valid ou non
      */
-    private boolean checkValidityTopic(int topic){
-        //TODO verifier que le nom de topic est correct
-        return true;
+    private boolean checkValidityTopic(String topic){
+        //TODO verifier que le nom de topic est correct (qu'il existe)
+        return this.user.verifyIfTopicExists(topic);
     }
 
-    /**
-     * Méthode permettant de lister les noms de topics
-     * Appel au JMS
-     */
-    public void listTopics(){
-        //listing des topics
-        System.out.println("Listing des topics existants:");
-        //TODO lister les topics existants
-        
-    }
 
     /**
      * Poster un message sur un topic JMS
@@ -140,13 +130,15 @@ public class ConsoleClient {
     public void postMessage(){
         boolean messageCorrect = false;
         boolean topicCorrect = false;
-        int topic = -1;
+        String topic = "";
         String tweet = "";
         while(!messageCorrect || !topicCorrect){
-            System.out.println("Saisissez votre topic:");
-            this.console.getNextLine();
+            System.out.println("Saisissez votre topic(hashtag):");
+            topic = this.console.getNextLine();
             if(this.checkValidityTopic(topic)){
                 topicCorrect=true;
+            }else{
+                user.createHashtag(topic);
             }
             System.out.println("Ecrivez votre message:");
             tweet = this.console.getNextLine();
