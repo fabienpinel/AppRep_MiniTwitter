@@ -21,18 +21,18 @@ public class User implements javax.jms.MessageListener {
     private String password;
     private boolean isConnected;
 
-	private Map<String, Message> receivedMessages;
+    private Map<String, Message> receivedMessages;
     private List<String> topicAlreadySubscribed;
 
     //JMS declarations
     private javax.jms.Session receiveSession = null;
     private javax.jms.Connection connect = null;
 
-	private TweetIDGenerator idGenerator;
+    private TweetIDGenerator idGenerator;
     private Map<String, MessageConsumer> followings = null;
-	private List<String> followedTopics;
+    private List<String> followedTopics;
 
-	/**
+    /**
      * Un utilisateur est identifié par un pseudo et un mot de passe
      *
      * @param pseudo   pseudo de l'utilisateur
@@ -42,11 +42,11 @@ public class User implements javax.jms.MessageListener {
         this.pseudo = pseudo;
         this.password = password;
         this.isConnected = false;
-		this.idGenerator = new TweetIDGenerator();
+        this.idGenerator = new TweetIDGenerator();
         this.topicAlreadySubscribed = new ArrayList<String>();
         this.followings = new HashMap<String, MessageConsumer>();
 
-		this.receivedMessages = new HashMap<>();
+        this.receivedMessages = new HashMap<>();
 
         // Create a connection.
         javax.jms.ConnectionFactory factory;
@@ -58,6 +58,25 @@ public class User implements javax.jms.MessageListener {
         }
     }
 
+    /**
+     * Création d'un compte sur le serveur RMI
+     * @param username
+     * @param pass
+     * @param port
+     * @return
+     */
+    public static boolean createAccount(String username, String pass, int port){
+        try {
+            Registry r = LocateRegistry.getRegistry(port);
+            AccountInformation req = (AccountInformation) r.lookup("Server");
+            return(req.createAccount(username, pass));
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
     /**
      * Méthode de connexion de l'utilisateur.
      * Interogation auprès du serveur rmi sur la classe AccountInformationImpl et la methode connect
@@ -122,9 +141,9 @@ public class User implements javax.jms.MessageListener {
     private void configurerConsommateur() throws JMSException {
         // Pour consommer, il faudra simplement ouvrir une session
         receiveSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-		MessageConsumer testConsumer = receiveSession.createConsumer(receiveSession.createTopic("#test"));
-		testConsumer.setMessageListener(this);
-		connect.start();
+        MessageConsumer testConsumer = receiveSession.createConsumer(receiveSession.createTopic("#test"));
+        testConsumer.setMessageListener(this);
+        connect.start();
         //queue = receiveSession.createQueue("tweetsQueue");
         //javax.jms.MessageConsumer qReceiver = receiveSession.createConsumer(queue);
         //qReceiver.setMessageListener(this);
@@ -136,28 +155,28 @@ public class User implements javax.jms.MessageListener {
     public void onMessage(Message message) {
         //System.out.println("Reception message: "+message.toString());
         try {
-			String id = message.getJMSCorrelationID();
-			// If the message has already been received, don't display it.
-			if (receivedMessages.keySet().contains(id)) {
-				return;
-			}
-			// Store the message
-			receivedMessages.put(id, message);
+            String id = message.getJMSCorrelationID();
+            // If the message has already been received, don't display it.
+            if (receivedMessages.keySet().contains(id)) {
+                return;
+            }
+            // Store the message
+            receivedMessages.put(id, message);
 
-			// Display the message
-			if (message instanceof MapMessage) {
-				MapMessage msg = (MapMessage) message;
-				System.out.println("Message:"+msg.getString("content"));
-			}
+            // Display the message
+            if (message instanceof MapMessage) {
+                MapMessage msg = (MapMessage) message;
+                System.out.println("Message:"+msg.getString("content"));
+            }
             else if (message instanceof TextMessage) {
-				TextMessage msg = (TextMessage) message;
+                TextMessage msg = (TextMessage) message;
                 System.out.println("Reading message: " +
                         msg.getText());
-			} else { System.out.println("Message of wrong type");
+            } else { System.out.println("Message of wrong type");
             }
         }
         catch (JMSException e) {
-			System.out.println("JMSException in onMessage(): " + e.toString());
+            System.out.println("JMSException in onMessage(): " + e.toString());
         }
     }
 
@@ -170,21 +189,21 @@ public class User implements javax.jms.MessageListener {
                 mc.setMessageListener(this);
                 this.topicAlreadySubscribed.add(hashtagName);
             }
-		} catch (JMSException e) {
+        } catch (JMSException e) {
             System.err.println("Could not create topic '" + hashtagName + "'");
             e.printStackTrace();
         }
     }
 
-	public void unfollowTopic(String topicName) {
-		MessageConsumer mc = followings.get(topicName);
-		try {
-			mc.close();
-			followings.remove(topicName);
-		} catch (JMSException e) {
-			e.printStackTrace();
-		}
-	}
+    public void unfollowTopic(String topicName) {
+        MessageConsumer mc = followings.get(topicName);
+        try {
+            mc.close();
+            followings.remove(topicName);
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void post(String tweet, String topic) throws JMSException, NamingException  {
         Topic t = receiveSession.createTopic(topic);
@@ -192,7 +211,7 @@ public class User implements javax.jms.MessageListener {
         MapMessage mess = receiveSession.createMapMessage();
         mess.setString("author", this.getPseudo());
         mess.setString("content", tweet);
-		mess.setJMSCorrelationID(idGenerator.nextId());
+        mess.setJMSCorrelationID(idGenerator.nextId());
         mp.send(mess);
         //On post également le message sur le topic de l'user courant
         receiveSession.createProducer(receiveSession.createTopic(this.getUsername())).send(mess);
@@ -210,11 +229,11 @@ public class User implements javax.jms.MessageListener {
         return "@"+this.getPseudo();
     }
 
-	public List<String> getFollowedHashTags() {
-		List<String> result = new LinkedList<>();
-		for (String s : followedTopics) {
-			if (s.substring(0,0).equals("#")) result.add(s);
-		}
-		return result;
-	}
+    public List<String> getFollowedHashTags() {
+        List<String> result = new LinkedList<>();
+        for (String s : followedTopics) {
+            if (s.substring(0,0).equals("#")) result.add(s);
+        }
+        return result;
+    }
 }

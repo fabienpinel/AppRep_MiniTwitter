@@ -31,8 +31,11 @@ public class ConsoleClient {
      * Initialisation des choix disponibles (choix non connecté, choix connecté)
      */
     private void initChoices(){
-        this.choicesConnect[0] = "Se connecter";
-        this.choicesConnect[1] = "Quitter";
+        this.choicesConnect = new String[]{
+                "Créer un compte",
+                "Se connecter",
+                "Quitter"
+        };
         this.choicesAlreadyConnected = new String[] {
 				"Poster Un message",
 				"Créer un nouveau hashtag",
@@ -77,6 +80,22 @@ public class ConsoleClient {
             System.out.println("Echec de l'authentification");
         }
     }
+
+    /**
+     * Tentative de connexion
+     * instanciation de l'utilisateur et appel de la methode connect de User
+     * @param port port du serveur rmi
+     */
+    public boolean createAccount(int port){
+        //pseudo + mdp
+        System.out.println("Entrez votre pseudo: ");
+        String pseudo = this.console.getNextLine();
+        System.out.println("Entrez votre password: ");
+        String password = this.console.getNextLine();
+        return User.createAccount(pseudo, password, port);
+    }
+
+
 
     /**
      * Vérification de la validité du hashtag
@@ -167,11 +186,15 @@ public class ConsoleClient {
             int choice = Integer.parseInt(this.console.getNextLine());
             switch (choice) {
                 case 0:
+                    this.createAccount(port);
+                    choiceValid = false;
+                    break;
+                case 1:
                     //se connecter
                     this.connect(port);
                     choiceValid = true;
                     break;
-                case 1:
+                case 2:
                     //quitter
                     choiceValid = true;
                     this.console.sayGoodbye();
