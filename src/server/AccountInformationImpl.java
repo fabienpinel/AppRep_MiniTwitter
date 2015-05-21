@@ -62,4 +62,11 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
     public void registerANewTopic(String topicName) throws RemoteException {
         this.topics.add(topicName);
     }
+
+    @Override
+    public List<String> getTopicList() throws RemoteException {
+        return this.topics;
+    }
+
+
 }
