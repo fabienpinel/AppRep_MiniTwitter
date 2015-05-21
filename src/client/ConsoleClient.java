@@ -19,7 +19,7 @@ public class ConsoleClient {
     public ConsoleClient(){
         this.console = new Console();
         this.choicesConnect = new String[2];
-        this.choicesAlreadyConnected = new String[4];
+        this.choicesAlreadyConnected = new String[5];
         this.initChoices();
     }
 
@@ -114,7 +114,7 @@ public class ConsoleClient {
      * @return true ou false valid ou non
      */
     private boolean checkValidityTopic(int topic){
-        //TODO verifier que le numero de topic est correct
+        //TODO verifier que le nom de topic est correct
         return true;
     }
 
@@ -124,6 +124,9 @@ public class ConsoleClient {
      */
     public void listTopics(){
         //listing des topics
+        System.out.println("Listing des topics existants:");
+        //TODO lister les topics existants
+        
     }
 
     /**
@@ -135,8 +138,7 @@ public class ConsoleClient {
         int topic = -1;
         String tweet = "";
         while(!messageCorrect || !topicCorrect){
-            System.out.println("Choisissez votre topic:");
-            this.listTopics();
+            System.out.println("Saisissez votre topic:");
             this.console.getNextLine();
             if(this.checkValidityTopic(topic)){
                 topicCorrect=true;
