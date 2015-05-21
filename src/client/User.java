@@ -92,7 +92,6 @@ public class User implements javax.jms.MessageListener {
         try {
             Registry r = LocateRegistry.getRegistry(port);
             AccountInformation req = (AccountInformation) r.lookup("Server");
-            this.joinTopic("#basic");
             if(req.connect(pseudo, password)){
                 //configurer jms server puis start ?
                 this.configurerConsommateur();
@@ -102,6 +101,8 @@ public class User implements javax.jms.MessageListener {
                 this.setIsConnected(true);
                 return true;
             }
+            receiveSession.createTopic("#basic");
+            this.joinTopic("#basic");
 
         } catch (RemoteException e) {
             e.printStackTrace();
