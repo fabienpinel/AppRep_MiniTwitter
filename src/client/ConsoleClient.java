@@ -103,7 +103,7 @@ public class ConsoleClient {
         //enregistrement du nouveau hashtag
         System.out.println("Enregistrement du nouveau hashtag...");
         //inscription de l'hashtag auprès du JMS
-		user.createHashtag(hashtag);
+		user.joinTopic(hashtag);
 		System.out.println("Hashtag enregistré!");
 	}
 
@@ -129,7 +129,7 @@ public class ConsoleClient {
         while(!messageCorrect){
             System.out.println("Saisissez votre topic(hashtag):");
             topic = this.console.getNextLine();
-            user.createHashtag(topic);
+            user.joinTopic(topic);
             System.out.println("Ecrivez votre message:");
             tweet = this.console.getNextLine();
             if(this.checkValidityTweet(tweet)) {
@@ -139,7 +139,7 @@ public class ConsoleClient {
         try {
             this.user.post(tweet,topic);
 			System.out.println("Message posté!");
-		} catch (JMSException e) {
+        } catch (JMSException e) {
             System.out.println("Cannot post this message");
             e.printStackTrace();
         } catch (NamingException e) {
