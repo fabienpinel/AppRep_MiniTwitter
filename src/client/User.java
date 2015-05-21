@@ -9,7 +9,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,7 +76,7 @@ public class User implements javax.jms.MessageListener {
             if(req.connect(pseudo, password)){
                 //configurer jms server puis start ?
                 this.configurerConsommateur();
-                this.joinTopic("@" + this.getPseudo());
+                this.joinTopic(this.getUsername());
                 this.joinTopic("#"+this.getPseudo()+"_favorites");
                 this.setIsConnected(true);
                 return true;
@@ -186,9 +185,19 @@ public class User implements javax.jms.MessageListener {
         mess.setString("content", tweet);
 		mess.setJMSCorrelationID(idGenerator.nextId());
         mp.send(mess);
+        //On post également le message sur le topic de l'user courant
+        receiveSession.createProducer(receiveSession.createTopic(this.getUsername())).send(mess);
     }
 
+    /**
+     * Méthode qui véifie si on est deja abonné à un hashtag ou non
+     * @param topicname nom du topic
+     * @return vrai ou faux deja abonné ou non 
+     */
     public boolean topicAlreaySubscribed(String topicname){
         return this.topicAlreadySubscribed.contains(topicname);
+    }
+    public String getUsername(){
+        return "@"+this.getPseudo();
     }
 }
