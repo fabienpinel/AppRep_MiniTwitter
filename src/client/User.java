@@ -20,6 +20,7 @@ public class User implements javax.jms.MessageListener {
     private String pseudo;
     private String password;
     private boolean isConnected;
+    int port;
 
     private Map<String, Message> receivedMessages;
     private List<String> topicAlreadySubscribed;
@@ -84,6 +85,7 @@ public class User implements javax.jms.MessageListener {
      * @return true ou false indiquant si la connexion a réussie ou non
      */
     public boolean connect(int port) {
+        this.port = port;
         if (isConnected) {
             return true;
         }
@@ -183,6 +185,8 @@ public class User implements javax.jms.MessageListener {
         try {
             if(!this.topicAlreaySubscribed(hashtagName)){
                 Topic t = receiveSession.createTopic(hashtagName);
+                //ajout du nouveau topic coté RMI
+                addATopicToRMI(hashtagName);
                 MessageConsumer mc = receiveSession.createConsumer(t);
                 this.followings.put(hashtagName, mc);
                 mc.setMessageListener(this);
@@ -216,6 +220,20 @@ public class User implements javax.jms.MessageListener {
         receiveSession.createProducer(receiveSession.createTopic(this.getUsername())).send(mess);
     }
 
+    public void addATopicToRMI(String topic){
+        try {
+            Registry r = LocateRegistry.getRegistry(port);
+            AccountInformation req = (AccountInformation) r.lookup("Server");
+           req.registerANewTopic(topic);
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.out.println(e.fillInStackTrace());
+        }
+    }
     /**
      * Méthode qui véifie si on est deja abonné à un hashtag ou non
      * @param topicname nom du topic
