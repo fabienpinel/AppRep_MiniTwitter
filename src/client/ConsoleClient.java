@@ -19,7 +19,7 @@ public class ConsoleClient {
     public ConsoleClient(){
         this.console = new Console();
         this.choicesConnect = new String[2];
-        this.choicesAlreadyConnected = new String[4];
+        this.choicesAlreadyConnected = new String[5];
         this.initChoices();
     }
 
@@ -30,9 +30,10 @@ public class ConsoleClient {
         this.choicesConnect[0] = "Se connecter";
         this.choicesConnect[1] = "Quitter";
         this.choicesAlreadyConnected[0] = "Poster Un message";
-        this.choicesAlreadyConnected[1] = "Créer un nouveau hashtag";
-        this.choicesAlreadyConnected[2] = "Se déconnecter";
-        this.choicesAlreadyConnected[3] = "Quitter";
+        this.choicesAlreadyConnected[1] = "Lister les topics";
+        this.choicesAlreadyConnected[2] = "Créer un nouveau hashtag";
+        this.choicesAlreadyConnected[3] = "Se déconnecter";
+        this.choicesAlreadyConnected[4] = "Quitter";
     }
 
     /**
@@ -119,7 +120,7 @@ public class ConsoleClient {
      * @return true ou false valid ou non
      */
     private boolean checkValidityTopic(int topic){
-        //TODO verifier que le numero de topic est correct
+        //TODO verifier que le nom de topic est correct
         return true;
     }
 
@@ -129,6 +130,9 @@ public class ConsoleClient {
      */
     public void listTopics(){
         //listing des topics
+        System.out.println("Listing des topics existants:");
+        //TODO lister les topics existants
+        
     }
 
     /**
@@ -140,8 +144,7 @@ public class ConsoleClient {
         int topic = -1;
         String tweet = "";
         while(!messageCorrect || !topicCorrect){
-            System.out.println("Choisissez votre topic:");
-            this.listTopics();
+            System.out.println("Saisissez votre topic:");
             this.console.getNextLine();
             if(this.checkValidityTopic(topic)){
                 topicCorrect=true;
@@ -201,17 +204,22 @@ public class ConsoleClient {
                     choiceValid = true;
                     break;
                 case 1:
+                    //lister les topics existants
+                    this.listTopics();
+                    choiceValid = true;
+                    break;
+                case 2:
                     //creer un nvx hashtag
                     this.createNewHashtag();
                     choiceValid = true;
                     break;
-                case 2:
+                case 3:
                     //se deconnecter
                     System.out.println("Déconnexion.");
                     this.user.setIsConnected(false);
                     this.run(this.port);
                     break;
-                case 3:
+                case 4:
                     //quitter
                     this.user.setIsConnected(false);
                     this.console.sayGoodbye();
