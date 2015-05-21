@@ -1,9 +1,11 @@
 package client;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.leveldb.DurableSubscription;
 import server.AccountInformation;
 
 import javax.jms.*;
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -49,8 +51,7 @@ public class User implements javax.jms.MessageListener {
         this.receivedMessages = new HashMap<>();
 
         // Create a connection.
-        javax.jms.ConnectionFactory factory;
-        factory = new ActiveMQConnectionFactory("user", "user", "tcp://"+jmsHost+":61616");
+        ConnectionFactory factory = factory = new ActiveMQConnectionFactory("user", "user", "tcp://"+jmsHost+":61616");
         try {
             connect = factory.createConnection("user", "user");
         } catch (JMSException e) {
@@ -129,8 +130,6 @@ public class User implements javax.jms.MessageListener {
         } catch (NotBoundException e) {
             e.printStackTrace();
         }
-
-
     }
 
     /*  GETTERS AND SETTERS */
@@ -159,10 +158,14 @@ public class User implements javax.jms.MessageListener {
     }
 
     private void configurerConsommateur() throws JMSException {
+        // On identifie l'utilisateur auprès de JMS pour pouvoir récupérer les anciens messages
+        connect.setClientID(this.getUsername());
+
         // Pour consommer, il faudra simplement ouvrir une session
         receiveSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
         MessageConsumer testConsumer = receiveSession.createConsumer(receiveSession.createTopic("#test"));
         testConsumer.setMessageListener(this);
+
         connect.start();
         //queue = receiveSession.createQueue("tweetsQueue");
         //javax.jms.MessageConsumer qReceiver = receiveSession.createConsumer(queue);
@@ -206,9 +209,11 @@ public class User implements javax.jms.MessageListener {
                 Topic t = receiveSession.createTopic(hashtagName);
                 //ajout du nouveau topic coté RMI
                 addATopicToRMI(hashtagName);
-                MessageConsumer mc = receiveSession.createConsumer(t);
-                this.followings.put(hashtagName, mc);
-                mc.setMessageListener(this);
+
+                // On veut pouvoir récupérer les messages entre deux connexions -> durableSubscriber
+                TopicSubscriber ds = receiveSession.createDurableSubscriber(t, "="+hashtagName+"_"+this.getUsername());
+                this.followings.put(hashtagName, ds);
+                ds.setMessageListener(this);
                 this.topicAlreadySubscribed.add(hashtagName);
             }
         } catch (JMSException e) {
