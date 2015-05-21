@@ -184,7 +184,7 @@ public class ConsoleClient {
     public void runConnected(){
         boolean choiceValid = false;
         System.out.println("Vous êtes connecté.");
-        while (!choiceValid && this.user.isConnected()) {
+        while (!choiceValid || this.user.isConnected()) {
             this.displayChoices(this.choicesAlreadyConnected);
             int choice = Integer.parseInt(this.console.getNextLine());
             switch (choice) {
