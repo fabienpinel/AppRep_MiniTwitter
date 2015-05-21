@@ -16,11 +16,13 @@ public class ConsoleClient {
     //tableaux contenant les choix disponibles
     private String[] choicesConnect;
     private String[] choicesAlreadyConnected;
+	private Action[] actionsConnect;
+	private Action[] actionsAlreadyConnected;
     //utilisateur
     protected User user = null;
     private int port;
 
-    public ConsoleClient(){
+	public ConsoleClient(){
         this.console = new Console();
         this.choicesConnect = new String[2];
         this.choicesAlreadyConnected = new String[4];
@@ -31,11 +33,28 @@ public class ConsoleClient {
      * Initialisation des choix disponibles (choix non connecté, choix connecté)
      */
     private void initChoices(){
-        this.choicesConnect = new String[]{
-                "Créer un compte",
-                "Se connecter",
-                "Quitter"
-        };
+		this.actionsConnect = new Action[] {
+				new Action("Créer un compte") {
+					@Override
+					public void execute() {
+						createAccount(port);
+					}
+				},
+				new Action("Se connecter") {
+					@Override
+					public void execute() {
+						connect(port);
+					}
+				},
+				new Action("Quitter") {
+					@Override
+					public void execute() {
+						quit();
+					}
+				}
+		};
+        /*this.choicesConnect[0] = "Se connecter";
+        this.choicesConnect[1] = "Quitter";
         this.choicesAlreadyConnected = new String[] {
 				"Poster Un message",
 				"Créer un nouveau hashtag",
@@ -43,6 +62,45 @@ public class ConsoleClient {
 				"Se désabonner à un hashtag",
 				"Se déconnecter",
 				"Quitter"
+		};*/
+		this.actionsAlreadyConnected = new Action[] {
+				new Action("Poster un message") {
+					@Override
+					public void execute() {
+						postMessage();
+					}
+				},
+				new Action("Créer un nouveau hashtag") {
+					@Override
+					public void execute() {
+						createNewHashtag();
+					}
+				},
+				new Action("S'abonner à un hashtag") {
+					@Override
+					public void execute() {
+						followHashtag();
+					}
+				},
+				new Action("Se désabonner d'un hashtag") {
+					@Override
+					public void execute() {
+						unfollowHashtag();
+					}
+				},
+				new Action("Se déconnecter") {
+					@Override
+					public void execute() {
+						disconnect();
+					}
+				},
+				new Action("Quitter") {
+
+					@Override
+					public void execute() {
+						quit();
+					}
+				}
 		};
     }
 
@@ -141,8 +199,6 @@ public class ConsoleClient {
         return (tweet.length() <= LONGUEUR_MAXIMALE_TWEET );
     }
 
-
-
     /**
      * Poster un message sur un topic JMS
      */
@@ -178,8 +234,10 @@ public class ConsoleClient {
      */
     public void run(int port){
         this.port = port;
+		this.console.sayHello();
+		displayMenu("", this.actionsConnect);
+		/*
         boolean choiceValid = false;
-        this.console.sayHello();
 
         while (!choiceValid) {
             this.displayChoices(this.choicesConnect);
@@ -203,7 +261,7 @@ public class ConsoleClient {
                     System.out.println("choix non reconnu");
                     choiceValid = false;
             }
-        }
+        }*/
     }
 
     /**
@@ -212,7 +270,10 @@ public class ConsoleClient {
     public void runConnected(){
         boolean choiceValid = false;
         System.out.println("Vous êtes connecté.");
-        while (!choiceValid || this.user.isConnected()) {
+		while (this.user.isConnected()) {
+			displayMenu("", actionsAlreadyConnected);
+		}
+        /*while (!choiceValid || this.user.isConnected()) {
             this.displayChoices(this.choicesAlreadyConnected);
             int choice = Integer.parseInt(this.console.getNextLine());
 			choiceValid = true;
@@ -248,8 +309,28 @@ public class ConsoleClient {
                     System.out.println("choix non reconnu");
                     choiceValid = false;
             }
-        }
+        }*/
     }
+
+	public void displayMenu(String message, Action[] actions) {
+		if (message.length() > 0) System.out.println(message);
+		for(int i = 0; i< actions.length; ++i) {
+			System.out.println("\t"+(i+1)+" - "+actions[i].getName());
+		}
+		int choice = readInt("Choisissez l'action à effectuer:", 1, actions.length);
+		actions[choice - 1].execute();
+	}
+
+	public void disconnect() {
+		System.out.println("Déconnexion.");
+		this.user.setIsConnected(false);
+		this.run(this.port);
+	}
+
+	public void quit() {
+		this.user.setIsConnected(false);
+		this.console.sayGoodbye();
+	}
 
 	public String readHashTag(String message) {
 		String hashtag = null;
@@ -266,10 +347,19 @@ public class ConsoleClient {
 	}
 
 	public int readInt(String message) {
+		return readInt(message, 0, 0);
+	}
+
+	public int readInt(String message, int start, int end) {
 		while (true) {
 			System.out.println(message);
 			try {
-				return Integer.parseInt(this.console.getNextLine());
+				int value = Integer.parseInt(this.console.getNextLine());
+				if (start != end && (value < start || value > end)) {
+					System.out.println("Vous devez entrer une valeur entre "+start+" et "+end+".");
+					continue;
+				}
+				return value;
 			} catch (NumberFormatException e) {
 				System.out.println("Vous devez entrer un nombre.");
 			}
