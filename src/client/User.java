@@ -143,14 +143,8 @@ public class User implements javax.jms.MessageListener {
             e.printStackTrace();
         }
     }
-    public boolean verifyIfTopicExists(String topicname){
-        Topic ts = null;
-        MessageProducer producer = null;
-        try {
-            producer = this.receiveSession.createProducer(ts);
-        } catch (JMSException e) {
-            e.printStackTrace();
-        }
-        return true;
+    public void post(String tweet, String topic){
+
     }
+
 }

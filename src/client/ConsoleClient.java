@@ -114,16 +114,6 @@ public class ConsoleClient {
         return (tweet.length() <= LONGUEUR_MAXIMALE_TWEET );
     }
 
-    /**
-     * Verification de la validité du topic.
-     * le numero du topic doit correspondre a un topic existant
-     * @param topic numero de topic
-     * @return true ou false valid ou non
-     */
-    private boolean checkValidityTopic(String topic){
-        //TODO verifier que le nom de topic est correct (qu'il existe)
-        return this.user.verifyIfTopicExists(topic);
-    }
 
 
     /**
@@ -137,18 +127,15 @@ public class ConsoleClient {
         while(!messageCorrect || !topicCorrect){
             System.out.println("Saisissez votre topic(hashtag):");
             topic = this.console.getNextLine();
-            if(this.checkValidityTopic(topic)){
-                topicCorrect=true;
-            }else{
-                user.createHashtag(topic);
-            }
+            user.createHashtag(topic);
             System.out.println("Ecrivez votre message:");
             tweet = this.console.getNextLine();
-            if(this.checkValidityTweet(tweet)){
+            if(this.checkValidityTweet(tweet)) {
                 messageCorrect = true;
             }
-
         }
+        //Poster le message
+        this.user.post(tweet,topic);
     }
 
     /**
