@@ -19,7 +19,7 @@ public class ConsoleClient {
     public ConsoleClient(){
         this.console = new Console();
         this.choicesConnect = new String[2];
-        this.choicesAlreadyConnected = new String[5];
+        this.choicesAlreadyConnected = new String[4];
         this.initChoices();
     }
 
@@ -30,10 +30,9 @@ public class ConsoleClient {
         this.choicesConnect[0] = "Se connecter";
         this.choicesConnect[1] = "Quitter";
         this.choicesAlreadyConnected[0] = "Poster Un message";
-        this.choicesAlreadyConnected[1] = "Lister les topics";
-        this.choicesAlreadyConnected[2] = "Créer un nouveau hashtag";
-        this.choicesAlreadyConnected[3] = "Se déconnecter";
-        this.choicesAlreadyConnected[4] = "Quitter";
+        this.choicesAlreadyConnected[1] = "Créer un nouveau hashtag";
+        this.choicesAlreadyConnected[2] = "Se déconnecter";
+        this.choicesAlreadyConnected[3] = "Quitter";
     }
 
     /**
@@ -58,7 +57,9 @@ public class ConsoleClient {
         System.out.println("Entrez votre password: ");
         String password = this.console.getNextLine();
         //appel à methode connect de user
-        user = new User(pseudo, password);
+		System.out.print("JMS Host IP:");
+		String jmsHost = this.console.getNextLine("localhost");
+        user = new User(pseudo, password, jmsHost);
         user.connect(port);
 
         if(this.user.isConnected()){
@@ -113,27 +114,7 @@ public class ConsoleClient {
         return (tweet.length() <= LONGUEUR_MAXIMALE_TWEET );
     }
 
-    /**
-     * Verification de la validité du topic.
-     * le numero du topic doit correspondre a un topic existant
-     * @param topic numero de topic
-     * @return true ou false valid ou non
-     */
-    private boolean checkValidityTopic(int topic){
-        //TODO verifier que le nom de topic est correct
-        return true;
-    }
 
-    /**
-     * Méthode permettant de lister les noms de topics
-     * Appel au JMS
-     */
-    public void listTopics(){
-        //listing des topics
-        System.out.println("Listing des topics existants:");
-        //TODO lister les topics existants
-        
-    }
 
     /**
      * Poster un message sur un topic JMS
@@ -141,21 +122,20 @@ public class ConsoleClient {
     public void postMessage(){
         boolean messageCorrect = false;
         boolean topicCorrect = false;
-        int topic = -1;
+        String topic = "";
         String tweet = "";
         while(!messageCorrect || !topicCorrect){
-            System.out.println("Saisissez votre topic:");
-            this.console.getNextLine();
-            if(this.checkValidityTopic(topic)){
-                topicCorrect=true;
-            }
+            System.out.println("Saisissez votre topic(hashtag):");
+            topic = this.console.getNextLine();
+            user.createHashtag(topic);
             System.out.println("Ecrivez votre message:");
             tweet = this.console.getNextLine();
-            if(this.checkValidityTweet(tweet)){
+            if(this.checkValidityTweet(tweet)) {
                 messageCorrect = true;
             }
-
         }
+        //Poster le message
+        this.user.post(tweet,topic);
     }
 
     /**
@@ -204,22 +184,17 @@ public class ConsoleClient {
                     choiceValid = true;
                     break;
                 case 1:
-                    //lister les topics existants
-                    this.listTopics();
-                    choiceValid = true;
-                    break;
-                case 2:
                     //creer un nvx hashtag
                     this.createNewHashtag();
                     choiceValid = true;
                     break;
-                case 3:
+                case 2:
                     //se deconnecter
                     System.out.println("Déconnexion.");
                     this.user.setIsConnected(false);
                     this.run(this.port);
                     break;
-                case 4:
+                case 3:
                     //quitter
                     this.user.setIsConnected(false);
                     this.console.sayGoodbye();

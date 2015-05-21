@@ -14,7 +14,7 @@ import java.rmi.registry.Registry;
 /**
  * Created by Fabien on 07/05/15.
  */
-public class User implements javax.jms.MessageListener{
+public class User implements javax.jms.MessageListener {
 
     private String pseudo;
     private String password;
@@ -22,25 +22,25 @@ public class User implements javax.jms.MessageListener{
 
     //JMS declarations
     private javax.jms.Session receiveSession = null;
-    private javax.jms.Queue queue = null;
     private javax.jms.Connection connect = null;
 
 
     /**
      * Un utilisateur est identifié par un pseudo et un mot de passe
-     * @param pseudo pseudo de l'utilisateur
+     *
+     * @param pseudo   pseudo de l'utilisateur
      * @param password mot de passe de l'utilisateur
      */
-    public User(String pseudo, String password){
+    public User(String pseudo, String password, String jmsHost){
         this.pseudo = pseudo;
         this.password = password;
         this.isConnected = false;
 
         // Create a connection.
         javax.jms.ConnectionFactory factory;
-        factory = new ActiveMQConnectionFactory("user", "user", "tcp://localhost:61616");
+        factory = new ActiveMQConnectionFactory("user", "user", "tcp://"+jmsHost+":61616");
         try {
-            connect = factory.createConnection ("user", "user");
+            connect = factory.createConnection("user", "user");
         } catch (JMSException e) {
             e.printStackTrace();
         }
@@ -49,20 +49,17 @@ public class User implements javax.jms.MessageListener{
     /**
      * Méthode de connexion de l'utilisateur.
      * Interogation auprès du serveur rmi sur la classe AccountInformationImpl et la methode connect
+     *
      * @param port port du serveur rmi (2002 par exemple)
      * @return true ou false indiquant si la connexion a réussie ou non
      */
-    public boolean connect(int port){
-        if(isConnected){
+    public boolean connect(int port) {
+        if (isConnected) {
             return true;
         }
         try {
-            //System.out.println("getregistry "+port);
             Registry r = LocateRegistry.getRegistry(port);
-            //LocateRegistry.getRegistry();
-            //System.out.println("lookup sur server.AccountServer");
             AccountInformation req = (AccountInformation) r.lookup("Server");
-            //AccountInformation req = (AccountInformation) Naming.lookup("rmi://localhost:2020/AccountInformation");
             if(req.connect(pseudo, password)){
                 //configurer jms server puis start ?
                 this.configurerConsommateur();
@@ -99,6 +96,7 @@ public class User implements javax.jms.MessageListener{
     public void setPassword(String Password) {
         this.password = password;
     }
+
     public boolean isConnected() {
         return isConnected;
     }
@@ -106,41 +104,55 @@ public class User implements javax.jms.MessageListener{
     public void setIsConnected(boolean isConnected) {
         this.isConnected = isConnected;
     }
+
     private void configurerConsommateur() throws JMSException {
         // Pour consommer, il faudra simplement ouvrir une session
         receiveSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-		queue = receiveSession.createQueue ("tweetsQueue");
-		javax.jms.MessageConsumer qReceiver = receiveSession.createConsumer(queue);
-        qReceiver.setMessageListener(this);
-        // Now that 'receive' setup is complete, start the Connection
+        //queue = receiveSession.createQueue("tweetsQueue");
+        //javax.jms.MessageConsumer qReceiver = receiveSession.createConsumer(queue);
+        //qReceiver.setMessageListener(this);
 
+        // Now that 'receive' setup is complete, start the Connection
     }
+
     @Override
     public void onMessage(Message message) {
-        System.out.println("Reception message: "+message.toString());
+        //System.out.println("Reception message: "+message.toString());
+
+        TextMessage msg = null;
+        try {
+            if (message instanceof TextMessage) {
+                msg = (TextMessage) message;
+                System.out.println("Reading message: " +
+                        msg.getText());
+            }
+            else { System.out.println("Message of wrong type");
+            }
+        }
+        catch (JMSException e) {
+            System.out.println("JMSException in onMessage(): " + e.toString());
+        }
     }
 
-	public void createHashtag(String hashtagName) {
-		try {
-			Topic t = receiveSession.createTopic(hashtagName);
-			MessageProducer mp = receiveSession.createProducer(t);
-			MapMessage mess = receiveSession.createMapMessage();
-			mess.setString("author", this.getPseudo());
-			mess.setString("content", "Création du topic");
-			mp.send(mess);
-		} catch (JMSException e) {
-			System.err.println("Could not create topic '"+hashtagName+"'");
-			e.printStackTrace();
-		}
-	}
-
-    public void sendHashtag(String message, String hashtagName) throws JMSException, NamingException {
-        Topic t = receiveSession.createTopic(hashtagName);
+    public void createHashtag(String hashtagName) {
+        try {
+            Topic t = receiveSession.createTopic(hashtagName);
+            MessageProducer mp = receiveSession.createProducer(t);
+            MapMessage mess = receiveSession.createMapMessage();
+            mess.setString("author", this.getPseudo());
+            mess.setString("content", "Création du topic");
+            mp.send(mess);
+        } catch (JMSException e) {
+            System.err.println("Could not create topic '" + hashtagName + "'");
+            e.printStackTrace();
+        }
+    }
+    public void post(String tweet, String topic) throws JMSException, NamingException  {
+        Topic t = receiveSession.createTopic(topic);
         MessageProducer mp = receiveSession.createProducer(t);
         MapMessage mess = receiveSession.createMapMessage();
         mess.setString("author", this.getPseudo());
-        mess.setString("content", message);
+        mess.setString("content", tweet);
         mp.send(mess);
     }
-
 }
