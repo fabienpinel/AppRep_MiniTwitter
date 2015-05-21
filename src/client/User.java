@@ -108,6 +108,7 @@ public class User implements javax.jms.MessageListener {
     private void configurerConsommateur() throws JMSException {
         // Pour consommer, il faudra simplement ouvrir une session
         receiveSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
+		connect.start();
         //queue = receiveSession.createQueue("tweetsQueue");
         //javax.jms.MessageConsumer qReceiver = receiveSession.createConsumer(queue);
         //qReceiver.setMessageListener(this);
