@@ -4,12 +4,13 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import server.AccountInformation;
 
 import javax.jms.*;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Fabien on 07/05/15.
@@ -20,10 +21,13 @@ public class User implements javax.jms.MessageListener {
     private String password;
     private boolean isConnected;
 
+	private Map<String, Message> receivedMessages;
+
     //JMS declarations
     private javax.jms.Session receiveSession = null;
     private javax.jms.Connection connect = null;
 
+	private TweetIDGenerator idGenerator;
 
     /**
      * Un utilisateur est identifié par un pseudo et un mot de passe
@@ -35,6 +39,9 @@ public class User implements javax.jms.MessageListener {
         this.pseudo = pseudo;
         this.password = password;
         this.isConnected = false;
+		this.idGenerator = new TweetIDGenerator();
+
+		//this.receiveSession = new HashMap<>();
 
         // Create a connection.
         javax.jms.ConnectionFactory factory;
@@ -108,6 +115,8 @@ public class User implements javax.jms.MessageListener {
     private void configurerConsommateur() throws JMSException {
         // Pour consommer, il faudra simplement ouvrir une session
         receiveSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
+		MessageConsumer testConsumer = receiveSession.createConsumer(receiveSession.createTopic("#test"));
+		testConsumer.setMessageListener(this);
 		connect.start();
         //queue = receiveSession.createQueue("tweetsQueue");
         //javax.jms.MessageConsumer qReceiver = receiveSession.createConsumer(queue);
@@ -120,8 +129,10 @@ public class User implements javax.jms.MessageListener {
     public void onMessage(Message message) {
         System.out.println("Reception message: "+message.toString());
 
+
         TextMessage msg = null;
         try {
+			System.out.println("ID:"+message.getJMSCorrelationID());
             if (message instanceof TextMessage) {
                 msg = (TextMessage) message;
                 System.out.println("Reading message: " +
@@ -162,6 +173,7 @@ public class User implements javax.jms.MessageListener {
         MapMessage mess = receiveSession.createMapMessage();
         mess.setString("author", this.getPseudo());
         mess.setString("content", tweet);
+		mess.setJMSCorrelationID(idGenerator.nextId());
         mp.send(mess);
     }
 }
