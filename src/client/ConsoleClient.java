@@ -57,7 +57,9 @@ public class ConsoleClient {
         System.out.println("Entrez votre password: ");
         String password = this.console.getNextLine();
         //appel à methode connect de user
-        user = new User(pseudo, password);
+		System.out.print("JMS Host IP:");
+		String jmsHost = this.console.getNextLine("localhost");
+        user = new User(pseudo, password, jmsHost);
         user.connect(port);
 
         if(this.user.isConnected()){

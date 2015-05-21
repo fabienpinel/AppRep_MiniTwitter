@@ -29,14 +29,14 @@ public class User implements javax.jms.MessageListener {
      * @param pseudo   pseudo de l'utilisateur
      * @param password mot de passe de l'utilisateur
      */
-    public User(String pseudo, String password) {
+    public User(String pseudo, String password, String jmsHost){
         this.pseudo = pseudo;
         this.password = password;
         this.isConnected = false;
 
         // Create a connection.
         javax.jms.ConnectionFactory factory;
-        factory = new ActiveMQConnectionFactory("user", "user", "tcp://localhost:61616");
+        factory = new ActiveMQConnectionFactory("user", "user", "tcp://"+jmsHost+":61616");
         try {
             connect = factory.createConnection("user", "user");
         } catch (JMSException e) {
@@ -56,13 +56,9 @@ public class User implements javax.jms.MessageListener {
             return true;
         }
         try {
-            //System.out.println("getregistry "+port);
             Registry r = LocateRegistry.getRegistry(port);
-            //LocateRegistry.getRegistry();
-            //System.out.println("lookup sur server.AccountServer");
             AccountInformation req = (AccountInformation) r.lookup("Server");
-            //AccountInformation req = (AccountInformation) Naming.lookup("rmi://localhost:2020/AccountInformation");
-            if (req.connect(pseudo, password)) {
+            if(req.connect(pseudo, password)){
                 //configurer jms server puis start ?
                 this.configurerConsommateur();
                 this.setIsConnected(true);
@@ -110,12 +106,11 @@ public class User implements javax.jms.MessageListener {
     private void configurerConsommateur() throws JMSException {
         // Pour consommer, il faudra simplement ouvrir une session
         receiveSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-
         //queue = receiveSession.createQueue("tweetsQueue");
         //javax.jms.MessageConsumer qReceiver = receiveSession.createConsumer(queue);
         //qReceiver.setMessageListener(this);
-        // Now that 'receive' setup is complete, start the Connection
 
+        // Now that 'receive' setup is complete, start the Connection
     }
 
     @Override
@@ -133,7 +128,6 @@ public class User implements javax.jms.MessageListener {
         catch (JMSException e) {
             System.out.println("JMSException in onMessage(): " + e.toString());
         }
-
     }
 
     public void createHashtag(String hashtagName) {
