@@ -342,7 +342,7 @@ public class ConsoleClient {
 
     public void followPerson() {
         System.out.println("S'abonner à une personne:");
-        String person = readPerson("Entrez le nom d'une à suivre:");
+        String person = readPerson("Entrez le nom d'une personne à suivre:");
         user.joinTopic(person);
         System.out.println("Vous suivez maintenant la personne " + person);
     }
