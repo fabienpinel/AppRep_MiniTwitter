@@ -45,13 +45,13 @@ public class User implements javax.jms.MessageListener {
         this.password = password;
         this.isConnected = false;
         this.idGenerator = new TweetIDGenerator();
-        this.topicAlreadySubscribed = new ArrayList<String>();
-        this.followings = new HashMap<String, MessageConsumer>();
+        this.topicAlreadySubscribed = new ArrayList<>();
+        this.followings = new HashMap<>();
 
         this.receivedMessages = new HashMap<>();
 
         // Create a connection.
-        ConnectionFactory factory = factory = new ActiveMQConnectionFactory("user", "user", "tcp://"+jmsHost+":61616");
+        ConnectionFactory factory = new ActiveMQConnectionFactory("user", "user", "tcp://"+jmsHost+":61616");
         try {
             connect = factory.createConnection("user", "user");
         } catch (JMSException e) {
