@@ -20,7 +20,6 @@ public class User implements javax.jms.MessageListener {
 
     //JMS declarations
     private javax.jms.Session receiveSession = null;
-    private javax.jms.Queue queue = null;
     private javax.jms.Connection connect = null;
 
 
@@ -111,16 +110,29 @@ public class User implements javax.jms.MessageListener {
     private void configurerConsommateur() throws JMSException {
         // Pour consommer, il faudra simplement ouvrir une session
         receiveSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-        queue = receiveSession.createQueue("tweetsQueue");
-        javax.jms.MessageConsumer qReceiver = receiveSession.createConsumer(queue);
-        qReceiver.setMessageListener(this);
+
+        //queue = receiveSession.createQueue("tweetsQueue");
+        //javax.jms.MessageConsumer qReceiver = receiveSession.createConsumer(queue);
+        //qReceiver.setMessageListener(this);
         // Now that 'receive' setup is complete, start the Connection
 
     }
 
     @Override
     public void onMessage(Message message) {
-        System.out.println("Reception message: " + message.toString());
+        TextMessage msg = null;
+        try {
+            if (message instanceof TextMessage) {
+                msg = (TextMessage) message;
+                System.out.println("Reading message: " +
+                        msg.getText());
+            }
+            else { System.out.println("Message of wrong type");
+            }
+        }
+        catch (JMSException e) {
+            System.out.println("JMSException in onMessage(): " + e.toString());
+        }
 
     }
 
@@ -138,6 +150,13 @@ public class User implements javax.jms.MessageListener {
         }
     }
     public boolean verifyIfTopicExists(String topicname){
+        Topic ts = null;
+        MessageProducer producer = null;
+        try {
+            producer = this.receiveSession.createProducer(ts);
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 }
