@@ -37,7 +37,7 @@ public class ConsoleClient {
 				new Action("Créer un compte") {
 					@Override
 					public void execute() {
-						connect(port);
+						createAccount(port);
 					}
 				},
 				new Action("Se connecter") {
