@@ -30,9 +30,10 @@ public class ConsoleClient {
         this.choicesConnect[0] = "Se connecter";
         this.choicesConnect[1] = "Quitter";
         this.choicesAlreadyConnected[0] = "Poster Un message";
-        this.choicesAlreadyConnected[1] = "Créer un nouveau hashtag";
-        this.choicesAlreadyConnected[2] = "Se déconnecter";
-        this.choicesAlreadyConnected[3] = "Quitter";
+        this.choicesAlreadyConnected[1] = "Lister les topics";
+        this.choicesAlreadyConnected[2] = "Créer un nouveau hashtag";
+        this.choicesAlreadyConnected[3] = "Se déconnecter";
+        this.choicesAlreadyConnected[4] = "Quitter";
     }
 
     /**
@@ -195,17 +196,22 @@ public class ConsoleClient {
                     choiceValid = true;
                     break;
                 case 1:
+                    //lister les topics existants
+                    this.listTopics();
+                    choiceValid = true;
+                    break;
+                case 2:
                     //creer un nvx hashtag
                     this.createNewHashtag();
                     choiceValid = true;
                     break;
-                case 2:
+                case 3:
                     //se deconnecter
                     System.out.println("Déconnexion.");
                     this.user.setIsConnected(false);
                     this.run(this.port);
                     break;
-                case 3:
+                case 4:
                     //quitter
                     this.user.setIsConnected(false);
                     this.console.sayGoodbye();
