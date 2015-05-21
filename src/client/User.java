@@ -117,7 +117,7 @@ public class User implements javax.jms.MessageListener {
 
     @Override
     public void onMessage(Message message) {
-        //System.out.println("Reception message: "+message.toString());
+        System.out.println("Reception message: "+message.toString());
 
         TextMessage msg = null;
         try {
@@ -137,16 +137,24 @@ public class User implements javax.jms.MessageListener {
     public void createHashtag(String hashtagName) {
         try {
             Topic t = receiveSession.createTopic(hashtagName);
-            MessageProducer mp = receiveSession.createProducer(t);
+			MessageConsumer mc = receiveSession.createConsumer(t);
+			mc.setMessageListener(this);
+            /*MessageProducer mp = receiveSession.createProducer(t);
             MapMessage mess = receiveSession.createMapMessage();
             mess.setString("author", this.getPseudo());
             mess.setString("content", "Création du topic");
-            mp.send(mess);
-        } catch (JMSException e) {
+
+			MessageConsumer mc = receiveSession.createConsumer(t);
+			mc.setMessageListener(this);
+
+            mp.send(mess);*/
+			//System.out.println("Message envoyé!");
+		} catch (JMSException e) {
             System.err.println("Could not create topic '" + hashtagName + "'");
             e.printStackTrace();
         }
     }
+
     public void post(String tweet, String topic) throws JMSException, NamingException  {
         Topic t = receiveSession.createTopic(topic);
         MessageProducer mp = receiveSession.createProducer(t);

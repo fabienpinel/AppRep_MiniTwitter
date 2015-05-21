@@ -138,7 +138,8 @@ public class ConsoleClient {
         }
         try {
             this.user.post(tweet,topic);
-        } catch (JMSException e) {
+			System.out.println("Message posté!");
+		} catch (JMSException e) {
             System.out.println("Cannot post this message");
             e.printStackTrace();
         } catch (NamingException e) {
