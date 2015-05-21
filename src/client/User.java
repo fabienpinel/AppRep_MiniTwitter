@@ -41,7 +41,7 @@ public class User implements javax.jms.MessageListener {
         this.isConnected = false;
 		this.idGenerator = new TweetIDGenerator();
 
-		//this.receiveSession = new HashMap<>();
+		this.receivedMessages = new HashMap<>();
 
         // Create a connection.
         javax.jms.ConnectionFactory factory;
@@ -127,14 +127,23 @@ public class User implements javax.jms.MessageListener {
 
     @Override
     public void onMessage(Message message) {
-        System.out.println("Reception message: "+message.toString());
-
-
-        TextMessage msg = null;
+        //System.out.println("Reception message: "+message.toString());
         try {
-			System.out.println("ID:"+message.getJMSCorrelationID());
-            if (message instanceof TextMessage) {
-                msg = (TextMessage) message;
+			String id = message.getJMSCorrelationID();
+			// If the message has already been received, don't display it.
+			if (receivedMessages.keySet().contains(id)) {
+				return;
+			}
+			// Store the message
+			receivedMessages.put(id, message);
+
+			// Display the message
+			if (message instanceof MapMessage) {
+				MapMessage msg = (MapMessage) message;
+				System.out.println("Message:"+msg.getString("content"));
+			}
+            else if (message instanceof TextMessage) {
+				TextMessage msg = (TextMessage) message;
                 System.out.println("Reading message: " +
                         msg.getText());
             }
