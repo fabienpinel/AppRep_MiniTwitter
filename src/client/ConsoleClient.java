@@ -82,6 +82,12 @@ public class ConsoleClient {
 						followHashtag();
 					}
 				},
+                new Action("S'abonner à une personne") {
+                    @Override
+                    public void execute() {
+                        followPerson();
+                    }
+                },
 				new Action("Se désabonner d'un hashtag") {
 					@Override
 					public void execute() {
@@ -163,6 +169,16 @@ public class ConsoleClient {
      */
     public boolean checkValidHashtag(String hashtag){
         return ((hashtag.charAt(0)=='#'));
+    }
+
+    /**
+     * Vérification de la validité d'une personne
+     * @ au début
+     * @param person  @ suivi du nom de la personne
+     * @return vrai ou faux suivant la validité
+     */
+    public boolean checkValidPerson(String person){
+        return ((person.charAt(0)=='@'));
     }
 
     /**
@@ -283,6 +299,20 @@ public class ConsoleClient {
 		return hashtag;
 	}
 
+    public String readPerson(String message) {
+        String person = null;
+        boolean isPersonValid = false;
+        while (! isPersonValid) {
+            System.out.print(message);
+            person = this.console.getNextLine();
+            isPersonValid = this.checkValidPerson(person);
+            if (!isPersonValid) {
+                System.out.println("person invalide. Doit commencer par @");
+            }
+        }
+        return person;
+    }
+
 	public int readInt(String message) {
 		return readInt(message, 0, 0);
 	}
@@ -309,6 +339,13 @@ public class ConsoleClient {
 		user.joinTopic(hashtag);
 		System.out.println("Vous suivez maintenant le hashtag "+hashtag);
 	}
+
+    public void followPerson() {
+        System.out.println("S'abonner à une personne:");
+        String person = readPerson("Entrez le nom d'une à suivre:");
+        user.joinTopic(person);
+        System.out.println("Vous suivez maintenant la personne " + person);
+    }
 
 	public void unfollowHashtag() {
 		System.out.println("Se désabonner d'un hashtag:");
