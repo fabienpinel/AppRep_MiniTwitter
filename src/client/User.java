@@ -3,8 +3,7 @@ package client;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import server.AccountInformation;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
+import javax.jms.*;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -120,4 +119,19 @@ public class User implements javax.jms.MessageListener{
         System.out.println("Reception message: "+message.toString());
 
     }
+
+	public void createHashtag(String hashtagName) {
+		try {
+			Topic t = receiveSession.createTopic(hashtagName);
+			MessageProducer mp = receiveSession.createProducer(t);
+			MapMessage mess = receiveSession.createMapMessage();
+			mess.setString("author", this.getPseudo());
+			mess.setString("content", "Création du topic");
+			mp.send(mess);
+		} catch (JMSException e) {
+			System.err.println("Could not create topic '"+hashtagName+"'");
+			e.printStackTrace();
+		}
+	}
+
 }

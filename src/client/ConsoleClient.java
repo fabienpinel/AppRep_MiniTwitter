@@ -84,17 +84,23 @@ public class ConsoleClient {
      */
     public void createNewHashtag(){
         boolean hashtagValid = false;
-        while(!hashtagValid){
-            System.out.println("Quel hashtag voulez vous créer ? (écrire le nom avec le # au début)");
-            String hashtag = this.console.getNextLine();
-            hashtagValid = this.checkValidHashtag(hashtag);
-        }
-        if(hashtagValid){
-            //enregistrement du nouveau hashtag
-            System.out.println("Enregistrement du nouveau hashtag.");
-            //inscription de l'hashtag auprès du JMS
-        }
-    }
+		String hashtag;
+		do {
+			System.out.println("Quel hashtag voulez vous créer ? (écrire le nom avec le # au début)");
+			hashtag = this.console.getNextLine();
+			hashtagValid = this.checkValidHashtag(hashtag);
+			if (!hashtagValid) {
+				System.out.printf("Le hashtag est invalide. (doit commencer par #)");
+			}
+		}
+        while(!hashtagValid);
+
+        //enregistrement du nouveau hashtag
+        System.out.println("Enregistrement du nouveau hashtag...");
+        //inscription de l'hashtag auprès du JMS
+		user.createHashtag(hashtag);
+		System.out.println("Hashtag enregistré!");
+	}
 
     /**
      * Verification de la validité d'un tweet
