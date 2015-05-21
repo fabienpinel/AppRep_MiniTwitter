@@ -2,6 +2,7 @@ package client;
 
 import javax.jms.JMSException;
 import javax.naming.NamingException;
+import java.util.List;
 
 /**
  * Created by Fabien on 09/05/15.
@@ -216,4 +217,46 @@ public class ConsoleClient {
             }
         }
     }
+
+	public String readHashTag(String message) {
+		String hashtag = null;
+		boolean isHashtagValid = false;
+		while (! isHashtagValid) {
+			System.out.print(message);
+			hashtag = this.console.getNextLine();
+			isHashtagValid = this.checkValidHashtag(hashtag);
+			if (!isHashtagValid) {
+				System.out.println("Hashtag invalide. Doit commencer par #");
+			}
+		}
+		return hashtag;
+	}
+
+	public int readInt(String message) {
+		while (true) {
+			System.out.println(message);
+			try {
+				return Integer.parseInt(this.console.getNextLine());
+			} catch (NumberFormatException e) {
+				System.out.println("Vous devez entrer un nombre.");
+			}
+		}
+	}
+
+	public void followHashtag() {
+		System.out.println("S'abonner à un hashtag:");
+		String hashtag = readHashTag("Entrez le nom du hashtag à suivre:");
+		user.joinTopic(hashtag);
+	}
+
+	public void unfollowHashtag() {
+		System.out.println("Se désabonner d'un hashtag:");
+		List<String> hashtags = user.getFollowedHashTags();
+		for (int i = 0; i< hashtags.size(); ++i) {
+			System.out.println("\t"+(i+1)+" - "+hashtags.get(i));
+		}
+		int i = readInt("Entrez le numero du hashtag duquel se désabonner:");
+		String hashtag = hashtags.get(i);
+		user.unfollowHashtag(hashtag);
+	}
 }

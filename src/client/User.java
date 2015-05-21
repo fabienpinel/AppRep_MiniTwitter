@@ -9,11 +9,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.*;
 import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Fabien on 07/05/15.
@@ -33,8 +30,9 @@ public class User implements javax.jms.MessageListener {
 
 	private TweetIDGenerator idGenerator;
     private Map<String, MessageConsumer> followings = null;
+	private List<String> followedHashTags;
 
-    /**
+	/**
      * Un utilisateur est identifié par un pseudo et un mot de passe
      *
      * @param pseudo   pseudo de l'utilisateur
@@ -78,7 +76,7 @@ public class User implements javax.jms.MessageListener {
                 //configurer jms server puis start ?
                 this.configurerConsommateur();
                 this.joinTopic("@" + this.getPseudo());
-                this.joinTopic("#"+this.getPseudo()+"_favorites");
+                this.joinTopic("#" + this.getPseudo() + "_favorites");
                 this.setIsConnected(true);
                 return true;
             }
@@ -191,4 +189,15 @@ public class User implements javax.jms.MessageListener {
     public boolean topicAlreaySubscribed(String topicname){
         return this.topicAlreadySubscribed.contains(topicname);
     }
+
+	public List<String> getFollowedHashTags() {
+		List<String> result = new LinkedList<>();
+		for (String s : followedHashTags) {
+			
+		}
+		return result;
+	}
+
+	public void unfollowHashtag(String hashtag) {
+	}
 }
