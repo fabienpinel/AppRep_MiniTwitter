@@ -262,11 +262,12 @@ public class ConsoleClient {
 	public void unfollowHashtag() {
 		System.out.println("Se désabonner d'un hashtag:");
 		List<String> hashtags = user.getFollowedHashTags();
+		System.out.println("Followed hashtags:"+hashtags.size());
 		for (int i = 0; i< hashtags.size(); ++i) {
 			System.out.println("\t"+(i+1)+" - "+hashtags.get(i));
 		}
 		int i = readInt("Entrez le numero du hashtag duquel se désabonner:");
-		String hashtag = hashtags.get(i);
+		String hashtag = hashtags.get((i-1));
 		user.unfollowTopic(hashtag);
 	}
 }
