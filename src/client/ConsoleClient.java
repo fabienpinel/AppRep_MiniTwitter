@@ -1,5 +1,8 @@
 package client;
 
+import javax.jms.JMSException;
+import javax.naming.NamingException;
+
 /**
  * Created by Fabien on 09/05/15.
  */
@@ -134,8 +137,16 @@ public class ConsoleClient {
                 messageCorrect = true;
             }
         }
+        try {
+            this.user.post(tweet,topic);
+        } catch (JMSException e) {
+            System.out.println("Cannot post this message");
+            e.printStackTrace();
+        } catch (NamingException e) {
+            e.printStackTrace();
+        }
         //Poster le message
-        this.user.post(tweet,topic);
+
     }
 
     /**
