@@ -370,6 +370,7 @@ public class ConsoleClient {
 		System.out.println("S'abonner à un hashtag:");
 		String hashtag = readHashTag("Entrez le nom du hashtag à suivre:");
 		user.joinTopic(hashtag);
+		System.out.println("Vous suivez maintenant le hashtag "+hashtag);
 	}
 
 	public void unfollowHashtag() {
