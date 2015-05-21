@@ -9,7 +9,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,6 +23,7 @@ public class User implements javax.jms.MessageListener {
     private boolean isConnected;
 
 	private Map<String, Message> receivedMessages;
+    private List<String> topicAlreadySubscribed;
 
     //JMS declarations
     private javax.jms.Session receiveSession = null;
@@ -40,6 +42,7 @@ public class User implements javax.jms.MessageListener {
         this.password = password;
         this.isConnected = false;
 		this.idGenerator = new TweetIDGenerator();
+        this.topicAlreadySubscribed = new ArrayList<String>();
 
 		//this.receiveSession = new HashMap<>();
 
@@ -132,7 +135,7 @@ public class User implements javax.jms.MessageListener {
 
         TextMessage msg = null;
         try {
-			System.out.println("ID:"+message.getJMSCorrelationID());
+			System.out.println("ID:" + message.getJMSCorrelationID());
             if (message instanceof TextMessage) {
                 msg = (TextMessage) message;
                 System.out.println("Reading message: " +
@@ -149,8 +152,12 @@ public class User implements javax.jms.MessageListener {
     public void createHashtag(String hashtagName) {
         try {
             Topic t = receiveSession.createTopic(hashtagName);
-			MessageConsumer mc = receiveSession.createConsumer(t);
-			mc.setMessageListener(this);
+            if(!this.topicAlreaySubscribed(hashtagName)){
+                MessageConsumer mc = receiveSession.createConsumer(t);
+                mc.setMessageListener(this);
+                this.topicAlreadySubscribed.add(hashtagName);
+            }
+
             /*MessageProducer mp = receiveSession.createProducer(t);
             MapMessage mess = receiveSession.createMapMessage();
             mess.setString("author", this.getPseudo());
@@ -175,5 +182,9 @@ public class User implements javax.jms.MessageListener {
         mess.setString("content", tweet);
 		mess.setJMSCorrelationID(idGenerator.nextId());
         mp.send(mess);
+    }
+
+    public boolean topicAlreaySubscribed(String topicname){
+        return this.topicAlreadySubscribed.contains(topicname);
     }
 }
