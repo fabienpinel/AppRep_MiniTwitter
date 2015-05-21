@@ -4,6 +4,8 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import server.AccountInformation;
 
 import javax.jms.*;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -22,7 +24,6 @@ public class User implements javax.jms.MessageListener{
     private javax.jms.Session receiveSession = null;
     private javax.jms.Queue queue = null;
     private javax.jms.Connection connect = null;
-
 
 
     /**
@@ -117,7 +118,6 @@ public class User implements javax.jms.MessageListener{
     @Override
     public void onMessage(Message message) {
         System.out.println("Reception message: "+message.toString());
-
     }
 
 	public void createHashtag(String hashtagName) {
@@ -133,5 +133,14 @@ public class User implements javax.jms.MessageListener{
 			e.printStackTrace();
 		}
 	}
+
+    public void sendHashtag(String message, String hashtagName) throws JMSException, NamingException {
+        Topic t = receiveSession.createTopic(hashtagName);
+        MessageProducer mp = receiveSession.createProducer(t);
+        MapMessage mess = receiveSession.createMapMessage();
+        mess.setString("author", this.getPseudo());
+        mess.setString("content", message);
+        mp.send(mess);
+    }
 
 }
