@@ -124,10 +124,9 @@ public class ConsoleClient {
      */
     public void postMessage(){
         boolean messageCorrect = false;
-        boolean topicCorrect = false;
         String topic = "";
         String tweet = "";
-        while(!messageCorrect || !topicCorrect){
+        while(!messageCorrect){
             System.out.println("Saisissez votre topic(hashtag):");
             topic = this.console.getNextLine();
             user.createHashtag(topic);
