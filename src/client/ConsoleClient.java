@@ -236,32 +236,6 @@ public class ConsoleClient {
         this.port = port;
 		this.console.sayHello();
 		displayMenu("", this.actionsConnect);
-		/*
-        boolean choiceValid = false;
-
-        while (!choiceValid) {
-            this.displayChoices(this.choicesConnect);
-            int choice = Integer.parseInt(this.console.getNextLine());
-            switch (choice) {
-                case 0:
-                    this.createAccount(port);
-                    choiceValid = false;
-                    break;
-                case 1:
-                    //se connecter
-                    this.connect(port);
-                    choiceValid = true;
-                    break;
-                case 2:
-                    //quitter
-                    choiceValid = true;
-                    this.console.sayGoodbye();
-                    break;
-                default:
-                    System.out.println("choix non reconnu");
-                    choiceValid = false;
-            }
-        }*/
     }
 
     /**
@@ -273,43 +247,6 @@ public class ConsoleClient {
 		while (this.user.isConnected()) {
 			displayMenu("", actionsAlreadyConnected);
 		}
-        /*while (!choiceValid || this.user.isConnected()) {
-            this.displayChoices(this.choicesAlreadyConnected);
-            int choice = Integer.parseInt(this.console.getNextLine());
-			choiceValid = true;
-            switch (choice) {
-                case 0:
-                    //poster un msg
-                    this.postMessage();
-                    break;
-                case 1:
-                    //creer un nvx hashtag
-                    this.createNewHashtag();
-                    break;
-				case 2:
-					// s'abonner
-					this.followHashtag();
-					break;
-				case 3:
-					// se désabonner
-					this.unfollowHashtag();
-					break;
-                case 5:
-                    //se deconnecter
-                    System.out.println("Déconnexion.");
-                    this.user.setIsConnected(false);
-                    this.run(this.port);
-                    break;
-                case 6:
-                    //quitter
-                    this.user.setIsConnected(false);
-                    this.console.sayGoodbye();
-                    break;
-                default:
-                    System.out.println("choix non reconnu");
-                    choiceValid = false;
-            }
-        }*/
     }
 
 	public void displayMenu(String message, Action[] actions) {
