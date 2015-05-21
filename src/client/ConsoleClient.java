@@ -128,8 +128,7 @@ public class ConsoleClient {
         String topic = "";
         String tweet = "";
         while(!messageCorrect){
-            System.out.println("Saisissez votre topic(hashtag):");
-            topic = this.console.getNextLine();
+            topic = this.readHashTag("Saisissez votre topic(hashtag):");
             user.joinTopic(topic);
             System.out.println("Ecrivez votre message:");
             tweet = this.console.getNextLine();
