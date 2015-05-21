@@ -24,10 +24,10 @@ public class User implements javax.jms.MessageListener {
     private javax.jms.Connection connect = null;
 
 
-
     /**
      * Un utilisateur est identifié par un pseudo et un mot de passe
-     * @param pseudo pseudo de l'utilisateur
+     *
+     * @param pseudo   pseudo de l'utilisateur
      * @param password mot de passe de l'utilisateur
      */
     public User(String pseudo, String password, String jmsHost){
@@ -39,7 +39,7 @@ public class User implements javax.jms.MessageListener {
         javax.jms.ConnectionFactory factory;
         factory = new ActiveMQConnectionFactory("user", "user", "tcp://"+jmsHost+":61616");
         try {
-            connect = factory.createConnection ("user", "user");
+            connect = factory.createConnection("user", "user");
         } catch (JMSException e) {
             e.printStackTrace();
         }
@@ -48,11 +48,12 @@ public class User implements javax.jms.MessageListener {
     /**
      * Méthode de connexion de l'utilisateur.
      * Interogation auprès du serveur rmi sur la classe AccountInformationImpl et la methode connect
+     *
      * @param port port du serveur rmi (2002 par exemple)
      * @return true ou false indiquant si la connexion a réussie ou non
      */
-    public boolean connect(int port){
-        if(isConnected){
+    public boolean connect(int port) {
+        if (isConnected) {
             return true;
         }
         try {
@@ -94,6 +95,7 @@ public class User implements javax.jms.MessageListener {
     public void setPassword(String Password) {
         this.password = password;
     }
+
     public boolean isConnected() {
         return isConnected;
     }
@@ -114,21 +116,23 @@ public class User implements javax.jms.MessageListener {
 
     @Override
     public void onMessage(Message message) {
-        System.out.println("Reception message: "+message.toString());
+        System.out.println("Reception message: " + message.toString());
     }
 
-	public void createHashtag(String hashtagName) {
-		try {
-			Topic t = receiveSession.createTopic(hashtagName);
-			MessageProducer mp = receiveSession.createProducer(t);
-			MapMessage mess = receiveSession.createMapMessage();
-			mess.setString("author", this.getPseudo());
-			mess.setString("content", "Création du topic");
-			mp.send(mess);
-		} catch (JMSException e) {
-			System.err.println("Could not create topic '"+hashtagName+"'");
-			e.printStackTrace();
-		}
-	}
-
+    public void createHashtag(String hashtagName) {
+        try {
+            Topic t = receiveSession.createTopic(hashtagName);
+            MessageProducer mp = receiveSession.createProducer(t);
+            MapMessage mess = receiveSession.createMapMessage();
+            mess.setString("author", this.getPseudo());
+            mess.setString("content", "Création du topic");
+            mp.send(mess);
+        } catch (JMSException e) {
+            System.err.println("Could not create topic '" + hashtagName + "'");
+            e.printStackTrace();
+        }
+    }
+    public boolean verifyIfTopicExists(String topicname){
+        return true;
+    }
 }
