@@ -1,5 +1,9 @@
 package server;
-import java.rmi.*;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.util.List;
+
 /**
  * Created by Fabien on 07/05/15.
  */
@@ -13,5 +17,7 @@ public interface AccountInformation extends Remote{
      */
     public boolean connect(String pseudo, String password) throws RemoteException;
     public boolean createAccount(String pseudo, String password) throws RemoteException;
+    public void registerANewTopic(String topicName) throws RemoteException;
+    public List<String> getTopicList() throws RemoteException;
 
 }

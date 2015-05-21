@@ -34,6 +34,12 @@ public class ConsoleClient {
      */
     private void initChoices(){
 		this.actionsConnect = new Action[] {
+				new Action("Créer un compte") {
+					@Override
+					public void execute() {
+						connect(port);
+					}
+				},
 				new Action("Se connecter") {
 					@Override
 					public void execute() {
@@ -134,6 +140,22 @@ public class ConsoleClient {
     }
 
     /**
+     * Tentative de connexion
+     * instanciation de l'utilisateur et appel de la methode connect de User
+     * @param port port du serveur rmi
+     */
+    public boolean createAccount(int port){
+        //pseudo + mdp
+        System.out.println("Entrez votre pseudo: ");
+        String pseudo = this.console.getNextLine();
+        System.out.println("Entrez votre password: ");
+        String password = this.console.getNextLine();
+        return User.createAccount(pseudo, password, port);
+    }
+
+
+
+    /**
      * Vérification de la validité du hashtag
      * # au début
      * @param hashtag string du hashtag
@@ -222,11 +244,15 @@ public class ConsoleClient {
             int choice = Integer.parseInt(this.console.getNextLine());
             switch (choice) {
                 case 0:
+                    this.createAccount(port);
+                    choiceValid = false;
+                    break;
+                case 1:
                     //se connecter
                     this.connect(port);
                     choiceValid = true;
                     break;
-                case 1:
+                case 2:
                     //quitter
                     choiceValid = true;
                     this.console.sayGoodbye();

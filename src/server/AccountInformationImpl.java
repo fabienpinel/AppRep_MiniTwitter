@@ -2,7 +2,9 @@ package server;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Fabien on 07/05/15.
@@ -12,6 +14,7 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
 
     //hashmap contenant les comptes (pseudo/mdp)
     private HashMap<String , String> accounts;
+    private List<String> topics;
 
     /**
      * Constructeur de AccountInformationImpl
@@ -21,6 +24,7 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
     public AccountInformationImpl() throws RemoteException {
         super();
         this.accounts = new HashMap<String , String>();
+        this.topics = new ArrayList<String>();
         this.initHashMapAccounts();
     }
 
@@ -53,4 +57,16 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
         this.accounts.put(pseudo, password);
         return true;
     }
+
+    @Override
+    public void registerANewTopic(String topicName) throws RemoteException {
+        this.topics.add(topicName);
+    }
+
+    @Override
+    public List<String> getTopicList() throws RemoteException {
+        return this.topics;
+    }
+
+
 }
