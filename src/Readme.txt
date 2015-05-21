@@ -8,9 +8,9 @@ Version de Java utilisée :  Java 1.7.0
 ####################    FONCTIONNALITES
 +   Console client interactive
 +   Connexion grace à un appel RMI afin de vérifier le compte
--   Listing des topics JMS accessibles
--   Choix d'un topic
--   Poster un message
+-   Poster un message sur un hastag
+-   S'abonner à un hashtag
+-	S'abonner à un utilisateur
 
 ####################    GRANDES LIGNES SUIVIES POUR ORGANISER LE CODE
 J'ai commencé par développé la console client interactive.
