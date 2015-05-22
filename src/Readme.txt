@@ -44,6 +44,12 @@ PACKAGE Client
 
 PACKAGE Server
     AccountInformation - Interface accessible via RMI et donc qui étend Remote.
+                         4 fonctions sont accessibles en RMI :
+                            1/  connect
+                            2/  createAccount
+                            3/  registerANewTopic
+                            4/  getTopicList
+
     AccountInformationImpl  -   Implémentation de AccountInformation (méthodes RMI)
     Main    -   Classe permettant de lancer le serveur.
     Server  -   Classe qui lance le serveur RMI et met à disposition les méthode de AccountInformation via le bind "Server"
