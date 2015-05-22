@@ -13,11 +13,17 @@ Version de Java utilisée :  Java 1.7.0
 +   Connexion grace à un appel RMI afin de vérifier le compte
 +   Stockage des Topics (hashtags) existants côté RMI sous forme de liste
 +   S'abonner à un hashtag
-+	S'abonner à un utilisateur
++   Se désabonner d'un hashtag
 +   Poster un message sur un hastag
 +   Recevoir les messages postés sur les topics auxquels nous sommes abonnés
 +   Pouvoir recevoir les messages publiés en mon absence lors de ma connexion
-+   Persistence des topics (hashtags) existants
++   Persistence des topics (hashtags) existants côté JMS
+
+####################    FONCTIONNALITES AJOUTEES
++   Création de compte
+    L'utilisateur peut créer un compte qui sera ajouté côté RMI
++	S'abonner à un utilisateur
+    Cela revient à s'abonner à un topic qui se nomme : @nomUtilisateur
 
 
 ####################    GRANDES LIGNES SUIVIES POUR ORGANISER LE CODE
@@ -26,6 +32,22 @@ No dus avons donc écrit des fonctions vide devant faire appel soit à RMI soit 
  et nous y avons écrit des TODOs.
 Ensuite nous avons déroulé les TODOs de la console client et ajouté les fonctionnalités  au fur et à mesure.
 De cette façon nous avons développé console client puis connexion RMI puis gestion des données JMS.
+
+##########  DESCRIPTION DE LA STRUCTURE
+PACKAGE Client
+    Action  -   Interface
+    Console -   Classe permettant de récupérer ce que tape l'utilisateur
+    ConsoleClient - Classe principale gérant l'interaction avec le client (actions disponibles etc.)
+    Main    -   Classe permettant de lancer le client
+    TweetIDGenerator    -   Classe permettant de générer un ID unique dont on se sert pour identifier un tweet en interne
+    User    -   Classe représentant un User en particulier. C'est cette classe qui intéragie avec RMI et JMS pour les actions.
+
+PACKAGE Server
+    AccountInformation - Interface accessible via RMI et donc qui étend Remote.
+    AccountInformationImpl  -   Implémentation de AccountInformation (méthodes RMI)
+    Main    -   Classe permettant de lancer le serveur.
+    Server  -   Classe qui lance le serveur RMI et met à disposition les méthode de AccountInformation via le bind "Server"
+
 
 ####################    DIFFICULTES RENCONTREES
 Le développpement de la console s'est fait assez facilement car rien de nouveau ni de complexe.
