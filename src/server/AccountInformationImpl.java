@@ -2,9 +2,7 @@ package server;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Fabien on 07/05/15.
@@ -15,6 +13,7 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
     //hashmap contenant les comptes (pseudo/mdp)
     private HashMap<String , String> accounts;
     private List<String> topics;
+	private Map<String, List<String>> followedTopics;
 
     /**
      * Constructeur de AccountInformationImpl
@@ -26,6 +25,8 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
         this.accounts = new HashMap<String , String>();
         this.topics = new ArrayList<String>();
         this.initHashMapAccounts();
+
+		this.followedTopics = new HashMap<>();
     }
 
     /**
@@ -70,5 +71,48 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
         return this.topics;
     }
 
+	private void persistFollowedTopics() {
+		// TODO: persist
+	}
+
+	@Override
+	public void onTopicFollow(String pseudo, String topicName) throws RemoteException {
+		System.out.println("Adding topic "+topicName+" to user "+pseudo);
+		// Get the list of followed topics by the user
+		List<String> userFollowedTopics = followedTopics.get(pseudo);
+		if (userFollowedTopics == null) {
+			userFollowedTopics = new LinkedList<>();
+			followedTopics.put(pseudo, userFollowedTopics);
+		}
+
+		if (! userFollowedTopics.contains(topicName)) {
+			userFollowedTopics.add(topicName);
+			persistFollowedTopics();
+		}
+	}
+
+	@Override
+	public List<String> getUserFollowedTopics(String pseudo) throws RemoteException {
+		List<String> result = followedTopics.get(pseudo);
+		if (result == null) result = new LinkedList<>();
+		return result;
+	}
+
+	private String serialize() {
+		String s = "";
+		for (String username : followedTopics.keySet()) {
+			String row = username+":";
+			try {
+				for (String topicName : getUserFollowedTopics(username)) {
+					row += topicName+":";
+				}
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+			row += "\n";
+			s += row;
+		}
+		return s;
+	}
 
 }

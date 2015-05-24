@@ -14,9 +14,12 @@ public class Main {
 
 		Console c = new Console();
 		server = new Server("localhost", 2002);
+
+		System.out.println("Démarrage du JMS");
         server.run();
 
-        System.out.println("Démarrage du JMS");
+		System.out.println("Chargement des topics utilisateurs...");
+		server.loadConfig();
 
     }
 }

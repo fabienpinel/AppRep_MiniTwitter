@@ -2,6 +2,10 @@ package server;
 
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Fabien on 07/05/15.
@@ -33,4 +37,26 @@ public class Server{
             e.printStackTrace();
         }
     }
+
+	public void loadConfig() {
+		String dir = System.getProperty("user.home");
+		System.out.println("User home:"+dir);
+	}
+
+	private Map<String, List<String>> deserialize(String input) {
+		Map<String, List<String>> map = new HashMap<>();
+		String[] lines = input.split("\n");
+		System.out.println("Deserializing from "+lines.length+" lines");
+		for (String l : lines) {
+			String[] parts = l.split(":");
+			String username = parts[0];
+			List<String> userFollowedTopics = new LinkedList<>();
+			for (int i = 1; i < parts.length; ++i) {
+				userFollowedTopics.add(parts[i]);
+			}
+			map.put(username, userFollowedTopics);
+		}
+
+		return map;
+	}
 }

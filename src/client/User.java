@@ -32,8 +32,9 @@ public class User implements javax.jms.MessageListener {
 
     private TweetIDGenerator idGenerator;
     private Map<String, MessageConsumer> followings = null;
+	private AccountInformation req;
 
-    /**
+	/**
      * Un utilisateur est identifié par un pseudo et un mot de passe
      *
      * @param pseudo   pseudo de l'utilisateur
@@ -50,11 +51,14 @@ public class User implements javax.jms.MessageListener {
         this.receivedMessages = new HashMap<>();
 
         // Create a connection.
-        ConnectionFactory factory = new ActiveMQConnectionFactory("user", "user", "tcp://"+jmsHost+":61616");
+		String jmsFullURI = "tcp://"+jmsHost+":61616";
+        ConnectionFactory factory = new ActiveMQConnectionFactory("user", "user", jmsFullURI);
         try {
             connect = factory.createConnection("user", "user");
         } catch (JMSException e) {
-            e.printStackTrace();
+			System.err.println("Could not connect to ActiveMQ at "+jmsFullURI+" with credentials user/user.");
+			System.err.println("Is ActiveMQ server running?");
+			System.exit(0);
         }
     }
 
@@ -91,7 +95,7 @@ public class User implements javax.jms.MessageListener {
         }
         try {
             Registry r = LocateRegistry.getRegistry(port);
-            AccountInformation req = (AccountInformation) r.lookup("Server");
+            req = (AccountInformation) r.lookup("Server");
             if(req.connect(pseudo, password)){
                 //configurer jms server puis start ?
                 this.configurerConsommateur();
@@ -99,10 +103,14 @@ public class User implements javax.jms.MessageListener {
                 this.joinTopic("#"+this.getPseudo()+"_favorites");
                 this.afficherTopicsDisponibles();
                 this.setIsConnected(true);
+				this.loadPreviousTopics(req.getUserFollowedTopics(pseudo));
                 return true;
-            }
-            receiveSession.createTopic("#basic");
-            this.joinTopic("#basic");
+            } else {
+				System.err.println("Invalid credentials");
+				return false;
+			}
+            //receiveSession.createTopic("#basic");
+            //this.joinTopic("#basic");
 
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -190,13 +198,14 @@ public class User implements javax.jms.MessageListener {
             // Display the message
             if (message instanceof MapMessage) {
                 MapMessage msg = (MapMessage) message;
-                System.out.println("Message:"+msg.getString("content"));
+                System.out.println("Message de "+msg.getString("author")+":"+msg.getString("content"));
             }
             else if (message instanceof TextMessage) {
                 TextMessage msg = (TextMessage) message;
                 System.out.println("Reading message: " +
                         msg.getText());
-            } else { System.out.println("Message of wrong type");
+            } else {
+				System.out.println("Message of wrong type");
             }
         }
         catch (JMSException e) {
@@ -209,6 +218,7 @@ public class User implements javax.jms.MessageListener {
             if(!this.topicAlreaySubscribed(hashtagName)){
                 Topic t = receiveSession.createTopic(hashtagName);
                 //ajout du nouveau topic coté RMI
+				req.onTopicFollow(pseudo, hashtagName);
                 addATopicToRMI(hashtagName);
 
                 // On veut pouvoir récupérer les messages entre deux connexions -> durableSubscriber
@@ -220,8 +230,11 @@ public class User implements javax.jms.MessageListener {
         } catch (JMSException e) {
             System.err.println("Could not create topic '" + hashtagName + "'");
             e.printStackTrace();
-        }
-    }
+        } catch (RemoteException e) {
+			System.err.println("Could not create topic '" + hashtagName + "'");
+			e.printStackTrace();
+		}
+	}
 
     public void unfollowTopic(String topicName) {
         MessageConsumer mc = followings.get(topicName);
@@ -248,22 +261,15 @@ public class User implements javax.jms.MessageListener {
 
     public void addATopicToRMI(String topic){
         try {
-            Registry r = LocateRegistry.getRegistry(port);
-            AccountInformation req = (AccountInformation) r.lookup("Server");
-           req.registerANewTopic(topic);
+           	req.registerANewTopic(topic);
 
             //On post également le topic sur le topic principal.
             MapMessage mess= receiveSession.createMapMessage();
             mess.setString("author", "administrator");
             mess.setString("content", topic);
             receiveSession.createProducer(receiveSession.createTopic("basic")).send(mess);
-
         } catch (RemoteException e) {
             e.printStackTrace();
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-            System.out.println(e.fillInStackTrace());
         } catch (JMSException e) {
             System.out.println("Could not create topic :" + e.getMessage());
             e.printStackTrace();
@@ -288,5 +294,28 @@ public class User implements javax.jms.MessageListener {
 			if (s.charAt(0) == '#') result.add(s);
 		}
 		return result;
+	}
+
+	public void loadPreviousTopics(List<String> userTopics) {
+		System.out.println("Loading " + userTopics.size() + "previous topics:");
+		for (String s : userTopics) {
+			try {
+				System.out.println("\t" + s);
+				if (topicAlreadySubscribed.contains(s)) {
+					System.out.println("\t\tSkipped");
+					continue;
+				}
+
+				Topic t = receiveSession.createTopic(s);
+				// On veut pouvoir récupérer les messages entre deux connexions -> durableSubscriber
+				TopicSubscriber ds = receiveSession.createDurableSubscriber(t, "=" + s + "_" + this.getUsername());
+				this.followings.put(s, ds);
+				ds.setMessageListener(this);
+				this.topicAlreadySubscribed.add(s);
+			} catch (JMSException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Done loading previous topics.");
 	}
 }
