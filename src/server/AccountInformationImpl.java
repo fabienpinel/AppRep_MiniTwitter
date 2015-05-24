@@ -94,6 +94,14 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
 	}
 
 	@Override
+	public void onTopicUnFollow(String pseudo, String topicName) throws RemoteException {
+		List<String> userFollowedTopics = followedTopics.get(pseudo);
+		if (userFollowedTopics.contains(topicName)) {
+			userFollowedTopics.remove(topicName);
+		}
+	}
+
+	@Override
 	public List<String> getUserFollowedTopics(String pseudo) throws RemoteException {
 		List<String> result = followedTopics.get(pseudo);
 		if (result == null) result = new LinkedList<>();
@@ -115,7 +123,8 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
 	private String serialize() {
 		String s = "";
 		for (String username : followedTopics.keySet()) {
-			String row = username + ":";
+			String password = accounts.get(username);
+			String row = username + ":"+password+":";
 			System.out.println("Serializing "+username);
 			try {
 				for (String topicName : getUserFollowedTopics(username)) {

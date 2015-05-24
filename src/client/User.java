@@ -71,7 +71,8 @@ public class User implements javax.jms.MessageListener {
      */
     public static boolean createAccount(String username, String pass, int port){
         try {
-            Registry r = LocateRegistry.getRegistry(port);
+			System.out.println("(Connecting to RMI @ "+ConsoleClient.RMI_IP);
+			Registry r = LocateRegistry.getRegistry(ConsoleClient.RMI_IP, port);
             AccountInformation req = (AccountInformation) r.lookup("Server");
             return(req.createAccount(username, pass));
         } catch (RemoteException e) {
@@ -94,7 +95,7 @@ public class User implements javax.jms.MessageListener {
             return true;
         }
         try {
-            Registry r = LocateRegistry.getRegistry(port);
+            Registry r = LocateRegistry.getRegistry(ConsoleClient.RMI_IP, port);
             req = (AccountInformation) r.lookup("Server");
             if(req.connect(pseudo, password)){
                 //configurer jms server puis start ?
@@ -128,13 +129,15 @@ public class User implements javax.jms.MessageListener {
         Registry r = null;
         List<String> topics=null;
         try {
-            r = LocateRegistry.getRegistry(port);
+            r = LocateRegistry.getRegistry(ConsoleClient.RMI_IP, port);
             AccountInformation req = (AccountInformation) r.lookup("Server");
             topics = req.getTopicList();
-            for(String s : topics){
-                System.out.println("Topic: "+s);
+			System.out.println("=== Topics disponibles sur ce serveur ===");
+			for(String s : topics){
+                System.out.println("\t"+s);
             }
-        } catch (RemoteException e) {
+			System.out.println("=========================================");
+		} catch (RemoteException e) {
             e.printStackTrace();
         } catch (NotBoundException e) {
             e.printStackTrace();
@@ -299,12 +302,12 @@ public class User implements javax.jms.MessageListener {
 	}
 
 	public void loadPreviousTopics(List<String> userTopics) {
-		System.out.println("Loading " + userTopics.size() + "previous topics:");
+		System.out.println("Vous etes abonné à " + userTopics.size() + " topics:");
 		for (String s : userTopics) {
 			try {
 				System.out.println("\t" + s);
 				if (topicAlreadySubscribed.contains(s)) {
-					System.out.println("\t\tSkipped");
+					//System.out.println("\t\tSkipped");
 					continue;
 				}
 
@@ -319,5 +322,21 @@ public class User implements javax.jms.MessageListener {
 			}
 		}
 		System.out.println("Done loading previous topics.");
+	}
+
+	public void disconnect() {
+		try {
+			connect.close();
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+		/*for (String s : followings.keySet()) {
+			MessageConsumer mc = followings.get(s);
+			try {
+				mc.setMessageListener(null);
+			} catch (JMSException e) {
+				e.printStackTrace();
+			}
+		}*/
 	}
 }

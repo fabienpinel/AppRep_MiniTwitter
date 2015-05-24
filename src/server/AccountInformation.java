@@ -20,6 +20,7 @@ public interface AccountInformation extends Remote {
     public void registerANewTopic(String topicName) throws RemoteException;
     public List<String> getTopicList() throws RemoteException;
 	public void onTopicFollow(String pseudo, String topicName) throws RemoteException;
+	public void onTopicUnFollow(String pseudo, String topicName) throws RemoteException;
 	public List<String> getUserFollowedTopics(String pseudo) throws RemoteException;
 
 }

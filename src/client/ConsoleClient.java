@@ -22,10 +22,16 @@ public class ConsoleClient {
     protected User user = null;
     private int port;
 
+	public static String RMI_IP = "localhost";
+
 	public ConsoleClient(){
         this.console = new Console();
         this.choicesConnect = new String[2];
         this.choicesAlreadyConnected = new String[4];
+
+		System.out.println("Entrez l'IP pour RMI:");
+		RMI_IP = this.console.getNextLine("localhost");
+
         this.initChoices();
     }
 
@@ -140,8 +146,9 @@ public class ConsoleClient {
         if(this.user.isConnected()){
             //si connect , appel à method runConnected
             this.runConnected();
-        }else{
+        } else {
             System.out.println("Echec de l'authentification");
+			run(port);
         }
     }
 
@@ -156,7 +163,7 @@ public class ConsoleClient {
         String pseudo = this.console.getNextLine();
         System.out.println("Entrez votre password: ");
         String password = this.console.getNextLine();
-        return User.createAccount(pseudo, password, port);
+		return User.createAccount(pseudo, password, port);
     }
 
 
@@ -277,6 +284,7 @@ public class ConsoleClient {
 	public void disconnect() {
 		System.out.println("Déconnexion.");
 		this.user.setIsConnected(false);
+		this.user.disconnect();
 		this.run(this.port);
 	}
 
@@ -354,8 +362,9 @@ public class ConsoleClient {
 		for (int i = 0; i< hashtags.size(); ++i) {
 			System.out.println("\t"+(i+1)+" - "+hashtags.get(i));
 		}
-		int i = readInt("Entrez le numero du hashtag duquel se désabonner:");
+		int i = readInt("Entrez le numero du hashtag duquel se désabonner:", 1, hashtags.size());
 		String hashtag = hashtags.get((i-1));
 		user.unfollowTopic(hashtag);
+		System.out.println("Vous avez été désabonné de "+hashtag+" avec succès");
 	}
 }
