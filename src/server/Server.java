@@ -1,5 +1,11 @@
 package server;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 import java.util.HashMap;
@@ -38,20 +44,58 @@ public class Server{
         }
     }
 
-	public void loadConfig() {
-		String dir = System.getProperty("user.home");
-		System.out.println("User home:"+dir);
+	public static String getAppDir() {
+		return System.getProperty("user.home")+"/.miniTwitter_gpr";
 	}
 
-	private Map<String, List<String>> deserialize(String input) {
+	public static String getUsersFile() {
+		return getAppDir()+"/users.data";
+	}
+
+	public void loadConfig() {
+		String dir = getAppDir();
+		String path = getUsersFile();
+		System.out.println("User home:"+dir);
+
+		try {
+			// Create dir if needed
+			Path dirP = Paths.get(dir);
+			if (!Files.exists(dirP)) {
+				Files.createDirectory(dirP);
+			}
+			// Create file if needed
+			File yourFile = new File(path);
+			if(!yourFile.exists()) {
+				yourFile.createNewFile();
+			}
+		} catch (IOException e) {
+			System.out.println("Could not read configuration file.");
+			e.printStackTrace();
+			System.exit(0);
+		}
+
+		// Read users data from file
+		try {
+			List<String> content = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
+			System.out.println("Loading config...");
+			deserialize(content);
+			System.out.println("Config loaded!");
+		} catch (IOException e) {
+			System.out.println("Could not read from config file!");
+			e.printStackTrace();
+		}
+	}
+
+	private Map<String, List<String>> deserialize(List<String> lines) {
 		Map<String, List<String>> map = new HashMap<>();
-		String[] lines = input.split("\n");
-		System.out.println("Deserializing from "+lines.length+" lines");
+		System.out.println("Deserializing from "+lines.size()+" lines");
 		for (String l : lines) {
+			System.out.println("Parsing: "+l);
 			String[] parts = l.split(":");
 			String username = parts[0];
 			List<String> userFollowedTopics = new LinkedList<>();
-			for (int i = 1; i < parts.length; ++i) {
+			for (int i = 1; i < parts.length - 1; ++i) {
+				System.out.println("\tAdding topic"+parts[i]+" to user "+username);
 				userFollowedTopics.add(parts[i]);
 			}
 			map.put(username, userFollowedTopics);

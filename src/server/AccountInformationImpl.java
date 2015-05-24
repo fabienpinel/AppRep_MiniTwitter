@@ -1,5 +1,9 @@
 package server;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
@@ -71,10 +75,6 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
         return this.topics;
     }
 
-	private void persistFollowedTopics() {
-		// TODO: persist
-	}
-
 	@Override
 	public void onTopicFollow(String pseudo, String topicName) throws RemoteException {
 		System.out.println("Adding topic "+topicName+" to user "+pseudo);
@@ -98,13 +98,25 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
 		return result;
 	}
 
+	private void persistFollowedTopics() {
+		System.out.println("Saving config!");
+		String serialized = serialize();
+		try {
+			Files.write(Paths.get(Server.getUsersFile()), serialized.getBytes());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private String serialize() {
 		String s = "";
 		for (String username : followedTopics.keySet()) {
-			String row = username+":";
+			String row = username + ":";
 			try {
 				for (String topicName : getUserFollowedTopics(username)) {
-					row += topicName+":";
+					row += topicName + ":";
 				}
 			} catch (RemoteException e) {
 				e.printStackTrace();
