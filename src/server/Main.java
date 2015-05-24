@@ -20,6 +20,7 @@ public class Main {
 
 		System.out.println("Chargement des topics utilisateurs...");
 		server.loadConfig();
+		System.out.println("Topics chargés!");
 
     }
 }

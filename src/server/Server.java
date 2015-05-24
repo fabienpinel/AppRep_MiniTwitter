@@ -48,14 +48,13 @@ public class Server{
 		return System.getProperty("user.home")+"/.miniTwitter_gpr";
 	}
 
-	public static String getUsersFile() {
-		return getAppDir()+"/users.data";
+	public static String getUsersTopicsFile() {
+		return getAppDir()+"/users_topics.data";
 	}
 
 	public void loadConfig() {
 		String dir = getAppDir();
-		String path = getUsersFile();
-		System.out.println("User home:"+dir);
+		String path = getUsersTopicsFile();
 
 		try {
 			// Create dir if needed
@@ -77,25 +76,22 @@ public class Server{
 		// Read users data from file
 		try {
 			List<String> content = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
-			System.out.println("Loading config...");
-			deserialize(content);
-			System.out.println("Config loaded!");
+			deserializeUserTopics(content);
 		} catch (IOException e) {
 			System.out.println("Could not read from config file!");
 			e.printStackTrace();
 		}
 	}
 
-	private Map<String, List<String>> deserialize(List<String> lines) {
+	private Map<String, List<String>> deserializeUserTopics(List<String> lines) {
 		Map<String, List<String>> map = new HashMap<>();
-		System.out.println("Deserializing from "+lines.size()+" lines");
 		for (String l : lines) {
-			System.out.println("Parsing: "+l);
+			System.out.println("\tParsing: "+l);
 			String[] parts = l.split(":");
 			String username = parts[0];
 			List<String> userFollowedTopics = new LinkedList<>();
-			for (int i = 1; i < parts.length - 1; ++i) {
-				System.out.println("\tAdding topic"+parts[i]+" to user "+username);
+			for (int i = 1; i < parts.length; ++i) {
+				System.out.println("\t\tAdding topic"+parts[i]+" to user "+username);
 				userFollowedTopics.add(parts[i]);
 			}
 			map.put(username, userFollowedTopics);

@@ -14,9 +14,11 @@ import java.util.*;
  */
 public class AccountInformationImpl extends UnicastRemoteObject implements AccountInformation {
 
-    //hashmap contenant les comptes (pseudo/mdp)
-    private HashMap<String , String> accounts;
+    // map contenant les comptes (pseudo/mdp)
+    private Map<String , String> accounts;
     private List<String> topics;
+
+	// map contenant les topics suivis par chaque utilisateur
 	private Map<String, List<String>> followedTopics;
 
     /**
@@ -102,7 +104,7 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
 		System.out.println("Saving config!");
 		String serialized = serialize();
 		try {
-			Files.write(Paths.get(Server.getUsersFile()), serialized.getBytes());
+			Files.write(Paths.get(Server.getUsersTopicsFile()), serialized.getBytes());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
