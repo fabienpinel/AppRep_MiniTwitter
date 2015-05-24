@@ -38,6 +38,7 @@ public class ConsoleClient {
 					@Override
 					public void execute() {
 						createAccount(port);
+						run(port);
 					}
 				},
 				new Action("Se connecter") {
@@ -85,7 +86,7 @@ public class ConsoleClient {
                 new Action("S'abonner à une personne") {
                     @Override
                     public void execute() {
-                        followPerson();
+						followPerson();
                     }
                 },
 				new Action("Se désabonner d'un hashtag") {
@@ -101,7 +102,6 @@ public class ConsoleClient {
 					}
 				},
 				new Action("Quitter") {
-
 					@Override
 					public void execute() {
 						quit();

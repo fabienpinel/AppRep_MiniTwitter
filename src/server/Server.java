@@ -77,27 +77,32 @@ public class Server{
 		// Read users data from file
 		try {
 			List<String> content = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
-			service.setFollowedTopics(deserializeUserTopics(content));
+			deserializeUserTopics(content);
 		} catch (IOException e) {
 			System.out.println("Could not read from config file!");
 			e.printStackTrace();
 		}
 	}
 
-	private Map<String, List<String>> deserializeUserTopics(List<String> lines) {
-		Map<String, List<String>> map = new HashMap<>();
+	private void deserializeUserTopics(List<String> lines) {
+		Map<String, String> users = new HashMap<>();
+		Map<String, List<String>> topics = new HashMap<>();
 		for (String l : lines) {
 			System.out.println("\tParsing: "+l);
 			String[] parts = l.split(":");
 			String username = parts[0];
+			String password = parts[1];
+			users.put(username, password);
+
 			List<String> userFollowedTopics = new LinkedList<>();
 			for (int i = 1; i < parts.length; ++i) {
 				System.out.println("\t\tAdding topic"+parts[i]+" to user "+username);
 				userFollowedTopics.add(parts[i]);
 			}
-			map.put(username, userFollowedTopics);
+			topics.put(username, userFollowedTopics);
 		}
 
-		return map;
+		service.setAccounts(users);
+		service.setFollowedTopics(topics);
 	}
 }

@@ -133,4 +133,8 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
 	public void setFollowedTopics(Map<String, List<String>> followedTopics) {
 		this.followedTopics = followedTopics;
 	}
+
+	public void setAccounts(Map<String, String> users) {
+		this.accounts = users;
+	}
 }
