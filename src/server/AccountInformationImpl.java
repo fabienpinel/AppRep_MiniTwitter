@@ -101,8 +101,8 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
 	}
 
 	private void persistFollowedTopics() {
-		System.out.println("Saving config!");
 		String serialized = serialize();
+		System.out.println("Saving config! (" + serialized.split("\n").length+" lines)");
 		try {
 			Files.write(Paths.get(Server.getUsersTopicsFile()), serialized.getBytes());
 		} catch (FileNotFoundException e) {
@@ -116,6 +116,7 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
 		String s = "";
 		for (String username : followedTopics.keySet()) {
 			String row = username + ":";
+			System.out.println("Serializing "+username);
 			try {
 				for (String topicName : getUserFollowedTopics(username)) {
 					row += topicName + ":";
@@ -129,4 +130,7 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
 		return s;
 	}
 
+	public void setFollowedTopics(Map<String, List<String>> followedTopics) {
+		this.followedTopics = followedTopics;
+	}
 }

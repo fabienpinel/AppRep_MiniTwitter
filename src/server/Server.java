@@ -20,8 +20,9 @@ import java.util.Map;
 public class Server{
     String host;
     int port;
+	private AccountInformationImpl service;
 
-    /**
+	/**
      * Serveur RMI
      * @param host adresse hote du serveur rmi (localhost...)
      * @param port port du serveur rmi (2002 par exemple)
@@ -36,9 +37,9 @@ public class Server{
      */
     public void run(){
         try {
-            AccountInformationImpl as = new AccountInformationImpl();
+            service = new AccountInformationImpl();
             LocateRegistry.createRegistry(port);
-            Naming.rebind("rmi://" + host + ":" + port + "/Server", as);
+            Naming.rebind("rmi://" + host + ":" + port + "/Server", service);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -76,7 +77,7 @@ public class Server{
 		// Read users data from file
 		try {
 			List<String> content = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
-			deserializeUserTopics(content);
+			service.setFollowedTopics(deserializeUserTopics(content));
 		} catch (IOException e) {
 			System.out.println("Could not read from config file!");
 			e.printStackTrace();
