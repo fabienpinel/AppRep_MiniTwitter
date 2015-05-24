@@ -198,7 +198,8 @@ public class User implements javax.jms.MessageListener {
             // Display the message
             if (message instanceof MapMessage) {
                 MapMessage msg = (MapMessage) message;
-                System.out.println("Message de "+msg.getString("author")+":"+msg.getString("content"));
+                System.out.println("Message de "+msg.getString("author")+" sur "+msg.getString("topic")+":"
+						+msg.getString("content"));
             }
             else if (message instanceof TextMessage) {
                 TextMessage msg = (TextMessage) message;
@@ -251,6 +252,7 @@ public class User implements javax.jms.MessageListener {
         MessageProducer mp = receiveSession.createProducer(t);
         MapMessage mess = receiveSession.createMapMessage();
         mess.setString("author", this.getPseudo());
+		mess.setString("topic", topic);
         mess.setString("content", tweet);
         mess.setJMSCorrelationID(idGenerator.nextId());
         mp.send(mess);
