@@ -21,7 +21,8 @@ Version de Java utilisée :  Java 1.7.0
 
 ####################    FONCTIONNALITES AJOUTEES
 +   Création de compte
-    L'utilisateur peut créer un compte qui sera ajouté côté RMI
+    L'utilisateur peut créer un compte qui sera ajouté côté RMI.
+    Le compte sera persisté entre 2 allumages du serveur, grâce à un fichier
 +	S'abonner à un utilisateur
     Cela revient à s'abonner à un topic qui se nomme : @nomUtilisateur
 

@@ -95,7 +95,7 @@ public class Server{
 			users.put(username, password);
 
 			List<String> userFollowedTopics = new LinkedList<>();
-			for (int i = 1; i < parts.length; ++i) {
+			for (int i = 2; i < parts.length; ++i) {
 				System.out.println("\t\tAdding topic"+parts[i]+" to user "+username);
 				userFollowedTopics.add(parts[i]);
 			}

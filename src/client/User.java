@@ -114,7 +114,7 @@ public class User implements javax.jms.MessageListener {
             //this.joinTopic("#basic");
 
         } catch (RemoteException e) {
-            e.printStackTrace();
+			e.printStackTrace();
         } catch (NotBoundException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
@@ -244,11 +244,13 @@ public class User implements javax.jms.MessageListener {
         MessageConsumer mc = followings.get(topicName);
         try {
             mc.close();
+			topicAlreadySubscribed.remove(topicName);
             followings.remove(topicName);
+			removeTopicFromRMI(topicName);
         } catch (JMSException e) {
             e.printStackTrace();
         }
-    }
+	}
 
     public void post(String tweet, String topic) throws JMSException, NamingException  {
         Topic t = receiveSession.createTopic(topic);
@@ -280,6 +282,15 @@ public class User implements javax.jms.MessageListener {
             e.printStackTrace();
         }
     }
+
+	public void removeTopicFromRMI(String topic) {
+		try {
+			req.onTopicUnFollow(this.pseudo, topic);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+
     /**
      * Méthode qui véifie si on est deja abonné à un hashtag ou non
      * @param topicname nom du topic

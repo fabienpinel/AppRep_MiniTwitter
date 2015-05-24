@@ -95,9 +95,11 @@ public class AccountInformationImpl extends UnicastRemoteObject implements Accou
 
 	@Override
 	public void onTopicUnFollow(String pseudo, String topicName) throws RemoteException {
+		System.out.println("User "+pseudo+" unfollowed topic '"+topicName+"'");
 		List<String> userFollowedTopics = followedTopics.get(pseudo);
 		if (userFollowedTopics.contains(topicName)) {
 			userFollowedTopics.remove(topicName);
+			persistFollowedTopics();
 		}
 	}
 
